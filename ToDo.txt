@@ -1,0 +1,3 @@
+ToolBox
+
+- Add a version of GetFiles/GetDirectories that takes a delegate that is called back for each file/directory.

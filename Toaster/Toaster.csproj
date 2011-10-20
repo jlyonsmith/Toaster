@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9FC1CE98-CE91-4D6E-929F-3B8092B28F68}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Toaster</RootNamespace>
+    <AssemblyName>Toaster</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ResourceStringWrapperType>ToolBelt.Message</ResourceStringWrapperType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Toaster.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assert.cs" />
+    <Compile Include="Attributes.cs" />
+    <Compile Include="ButterTool.cs" />
+    <Compile Include="CollectionAssert.cs" />
+    <Compile Include="CrumbTool.cs" />
+    <Compile Include="DeploymentItem.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="ExceptionUtility.cs" />
+    <Compile Include="InternalsVisibleTo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropertyCollection.cs" />
+    <Compile Include="TestAssembly.cs" />
+    <Compile Include="TestClass.cs" />
+    <Compile Include="TestContext.cs" />
+    <Compile Include="TestMethod.cs" />
+    <Compile Include="TestResult.cs" />
+    <Compile Include="ToastTool.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <MessageResxFile Include="TestingResources.resx">
+      <SubType>Designer</SubType>
+    </MessageResxFile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Toaster.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ToolBelt\ToolBelt.csproj">
+      <Project>{52B1B4C0-34D2-4867-AD1F-0EE565F89DC5}</Project>
+      <Name>ToolBelt</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\Buckle\ToolBelt.Buckle.targets" />
+</Project>

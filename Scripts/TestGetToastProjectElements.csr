@@ -1,0 +1,59 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.IO;
+using Microsoft.Tools.CodeRunner;
+using System.Xml;
+
+public class Program
+{
+	public static int Main(string[] args)
+	{
+		if (args.Length == 0)
+		{
+			Console.WriteLine("Usage: {0} <proj-file>", ScriptEnvironment.ScriptPath.FileAndExtension);
+			return 0;
+		}
+
+        bool isToastUnitTestProject = false;
+        List<string> deploymentItems = new List<string>();
+
+        using (XmlReader reader = XmlReader.Create(args[0]))
+        {
+            string toastUnitTestProjectName = reader.NameTable.Add("ToastUnitTestProject");
+            string toastDeploymentItemName = reader.NameTable.Add("ToastDeploymentItem");
+            string includeName = reader.NameTable.Add("Include");
+
+            while (reader.Read())
+            {
+                if (object.Equals(reader.LocalName, toastUnitTestProjectName))
+                {
+                    isToastUnitTestProject = (String.Compare(
+                        reader.ReadElementContentAsString(), "true",
+                        StringComparison.InvariantCultureIgnoreCase) == 0);
+                }
+                else if (object.Equals(reader.LocalName, toastDeploymentItemName))
+                {
+                    reader.MoveToAttribute(includeName, String.Empty);
+
+                    while (reader.ReadAttributeValue())
+                    {
+                        deploymentItems.Add(reader.Value);
+                    }
+                }
+            }
+        }
+
+        Console.WriteLine("<ToastUnitTestProject>{0}</ToastUnitTestProject>", isToastUnitTestProject.ToString());
+
+        Console.WriteLine("<ItemGroup>");
+        foreach (string deploymentItem in deploymentItems)
+        {
+            Console.WriteLine("  <ToastDeploymentItem Include=\"{0}\" />", deploymentItem);
+        }
+        Console.WriteLine("</ItemGroup>");
+
+		return 0;
+	}
+}

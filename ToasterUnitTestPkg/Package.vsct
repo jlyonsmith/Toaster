@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h"/>
+
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h"/>
+
+  <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
+  <Extern href="msobtnid.h"/>
+
+  <Commands package="guidToasterUnitTestPkg">
+    <Groups>
+      <Group guid="guidToasterUnitTestCmdSet" id="ToasterMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+    </Groups>
+    
+    <Buttons>
+      <Button guid="guidToasterUnitTestCmdSet" id="cmdidRunToasterTests" priority="0x0100" type="Button">
+        <Parent guid="guidToasterUnitTestCmdSet" id="ToasterMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <CommandName>cmdidRunToasterTests</CommandName>
+          <ButtonText>Run Toaster Unit Tests</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+   
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\Images_24bit.bmp" usedList="bmpRunToasterUnitTests"/>
+    </Bitmaps>
+  </Commands>
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidToasterUnitTestPkg" value="{fc0f5eae-50c9-4a83-9359-640e7b8e8c9d}" />
+    
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidToasterUnitTestCmdSet" value="{a2b7fbdf-5ff5-49fc-a033-1890f62ff63a}">
+      <IDSymbol name="ToasterMenuGroup" value="0x1020" />
+      <IDSymbol name="cmdidRunToasterTests" value="0x0100" />
+    </GuidSymbol>
+    
+    <GuidSymbol name="guidImages" value="{a40cc7b1-5179-44b9-bdb2-7bd226e03222}" >
+      <IDSymbol name="bmpRunToasterUnitTests" value="1" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
