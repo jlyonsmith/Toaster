@@ -177,7 +177,7 @@ namespace Buckle
 				}
 				else
 				{
-					ConsoleUtility.WriteMessage(MessageType.Warning, "Resource skipped. Type {0} is not public.", item.DataType);
+					Output.Warning("Resource skipped. Type {0} is not public.", item.DataType);
 				}
 			}
 			Console.WriteLine("Generated strongly typed resource wrapper method(s) for {0} resource(s) in {1}", num, ResXFileName);
@@ -267,7 +267,7 @@ using System.Globalization;
 				}
 				catch (ApplicationException exception)
 				{
-					ConsoleUtility.WriteMessage(MessageType.Error, "Resource has been skipped: {0}", exception.Message);
+					Output.Error("Resource has been skipped: {0}", exception.Message);
 				}
 				for (int j = 0; j < paramCount; j++)
 				{
@@ -454,7 +454,7 @@ using System.Globalization;
 				string attribute = element.GetAttribute("name");
 				if ((attribute == null) || (attribute.Length == 0))
 				{
-					ConsoleUtility.WriteMessage(MessageType.Warning, "Resource skipped. Empty name attribute: {0}", element.OuterXml);
+					Output.Warning("Resource skipped. Empty name attribute: {0}", element.OuterXml);
 					continue;
 				}
 				Type dataType = null;
@@ -467,7 +467,7 @@ using System.Globalization;
 					}
 					catch (Exception exception)
 					{
-						ConsoleUtility.WriteMessage(MessageType.Warning, "Resource skipped. Could not load type {0}: {1}", typeName, exception.Message);
+						Output.Warning("Resource skipped. Could not load type {0}: {1}", typeName, exception.Message);
 						continue;
 					}
 				}
@@ -482,7 +482,7 @@ using System.Globalization;
 					}
 					if (stringResourceValue == null)
 					{
-						ConsoleUtility.WriteMessage(MessageType.Warning, "Resource skipped.  Empty value attribute: {0}", element.OuterXml);
+						Output.Warning("Resource skipped.  Empty value attribute: {0}", element.OuterXml);
 						continue;
 					}
 					item = new ResourceItem(attribute, stringResourceValue);

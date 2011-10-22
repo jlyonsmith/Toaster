@@ -3,7 +3,7 @@
   <Identifier Id="fc0f5eae-50c9-4a83-9359-640e7b8e8c9d">
     <Name>Toaster .NET Unit Test Extension</Name>
     <Author>John Lyon-Smith</Author>
-    <Version>1.4.20601</Version>
+    <Version>1.4.21022</Version>
     <Description xml:space="preserve">An extension for running Toast based unit tests from within the Visual Studio IDE.</Description>
     <Locale>1033</Locale>
     <InstalledByMsi>false</InstalledByMsi>
