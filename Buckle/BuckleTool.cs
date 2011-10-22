@@ -180,7 +180,7 @@ namespace Buckle
 					Output.Warning("Resource skipped. Type {0} is not public.", item.DataType);
 				}
 			}
-			Console.WriteLine("Generated strongly typed resource wrapper method(s) for {0} resource(s) in {1}", num, ResXFileName);
+			Output.Message("Generated strongly typed resource wrapper method(s) for {0} resource(s) in {1}", num, ResXFileName);
 			WriteClassEnd();
 			WriteNamespaceEnd();
 		}

@@ -13,14 +13,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2F671BD5-29CB-47CA-A05D-E8C50B24D67B}</ProjectGuid>
     <RootNamespace>chgmvid</RootNamespace>
-    <SccProjectName>
-    </SccProjectName>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccProvider>
-    </SccProvider>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
