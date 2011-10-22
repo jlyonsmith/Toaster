@@ -6,6 +6,8 @@ using System.Xml;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Drawing;
+using System.Reflection;
 
 namespace Buckle
 {
@@ -67,7 +69,7 @@ namespace Buckle
 				{
 					return this.valueString;
 				}
-			} 
+			}
 			#endregion
 		}
 
@@ -80,6 +82,7 @@ namespace Buckle
 		private const string InvalidCharacters = ".$*{}|<>";
 		private CommandLineParser parser;
 		private bool runningFromCommandLine = false;
+        private bool haveDrawingResources = false;
 		
 		#endregion
 
@@ -212,6 +215,16 @@ using System.Diagnostics;
 using System.Globalization;
 "
 				);
+
+            if (haveDrawingResources)
+            {
+                writer.Write(
+    @"using System.Drawing;
+"
+                    );
+            }
+
+            writer.WriteLine();
 		}
 
 		private void WriteNamespaceEnd()
@@ -448,7 +461,16 @@ using System.Globalization;
 		{
 			this.resources.Clear();
 			XmlDocument document = new XmlDocument();
-			document.Load(this.ResXFileName);
+			
+            document.Load(this.ResXFileName);
+
+            Dictionary<string, string> assemblyDict = new Dictionary<string, string>();
+
+            foreach (XmlElement element in document.DocumentElement.SelectNodes("assembly"))
+            {
+                assemblyDict.Add(element.GetAttribute("alias"), element.GetAttribute("name"));
+            }
+
 			foreach (XmlElement element in document.DocumentElement.SelectNodes("data"))
 			{
 				string attribute = element.GetAttribute("name");
@@ -457,10 +479,17 @@ using System.Globalization;
 					Output.Warning("Resource skipped. Empty name attribute: {0}", element.OuterXml);
 					continue;
 				}
-				Type dataType = null;
+				
+                Type dataType = null;
 				string typeName = element.GetAttribute("type");
-				if ((typeName != null) && (typeName.Length != 0))
+
+                if ((typeName != null) && (typeName.Length != 0))
 				{
+                    string[] parts = typeName.Split(',');
+
+                    // Replace assembly alias with full name
+                    typeName = parts[0] + ", " + assemblyDict[parts[1].Trim()];
+
 					try
 					{
 						dataType = Type.GetType(typeName, true);
@@ -471,8 +500,11 @@ using System.Globalization;
 						continue;
 					}
 				}
-				ResourceItem item = null;
-				if ((dataType == null) || (dataType == typeof(string)))
+				
+                ResourceItem item = null;
+				
+                // String resources typically have no type name
+                if ((dataType == null) || (dataType == typeof(string)))
 				{
 					string stringResourceValue = null;
 					XmlNode node = element.SelectSingleNode("value");
@@ -487,10 +519,13 @@ using System.Globalization;
 					}
 					item = new ResourceItem(attribute, stringResourceValue);
 				}
-				else
-				{
-					item = new ResourceItem(attribute, dataType);
-				}
+                else
+                {
+                    if (dataType == typeof(Icon) || dataType == typeof(Bitmap))
+                        haveDrawingResources = true;
+
+                    item = new ResourceItem(attribute, dataType);
+                }
 				this.resources.Add(item);
 			}
 		}
