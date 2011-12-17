@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolBelt.MS.UnitTests", "Te
 		{591C5B3E-E463-4103-9147-88CB7876EB54} = {591C5B3E-E463-4103-9147-88CB7876EB54}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toolbelt.Windows", "Jamoki.Toolbelt.Remoting\Toolbelt.Windows.csproj", "{4B886FEC-E4D5-451D-B361-5AD19217D9AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +178,14 @@ Global
 		{F468EC08-244F-408C-87A4-6B271F017859}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F468EC08-244F-408C-87A4-6B271F017859}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F468EC08-244F-408C-87A4-6B271F017859}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4B886FEC-E4D5-451D-B361-5AD19217D9AB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

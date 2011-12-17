@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ToolBelt</RootNamespace>
-    <AssemblyName>ToolBelt</AssemblyName>
+    <AssemblyName>ToolBelt.1.5</AssemblyName>
     <ResourceStringWrapperType>ToolBelt.Message</ResourceStringWrapperType>
     <AssemblyOriginatorKeyFile>..\ToolBelt.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
@@ -59,10 +59,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigEndianBitConverter.cs" />
@@ -81,7 +77,6 @@
     <Compile Include="ITool.cs" />
     <Compile Include="IOutputter.cs" />
     <Compile Include="IProcessCommandLine.cs" />
-    <Compile Include="IProcessConfiguration.cs" />
     <Compile Include="IProcessEnvironment.cs" />
     <Compile Include="LittleEndianBitConverter.cs" />
     <Compile Include="Memory.cs" />
@@ -95,7 +90,6 @@
     <Compile Include="PathUtility.cs" />
     <Compile Include="ProcessCycleStopwatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RemoteOutputter.cs" />
     <Compile Include="StreamUtility.cs" />
     <Compile Include="StringUtility.cs" />
     <Compile Include="TraceOutputter.cs" />
