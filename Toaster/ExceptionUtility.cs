@@ -22,7 +22,6 @@ namespace Toaster
                 e is StackOverflowException || 
                 e is OutOfMemoryException || 
                 e is ThreadAbortException || 
-                e is ExecutionEngineException || 
                 e is IndexOutOfRangeException || 
                 e is AccessViolationException;
         }

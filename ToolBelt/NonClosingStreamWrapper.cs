@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+#if WINDOWS
 using System.Runtime.Remoting;
+#endif
 
 namespace ToolBelt
 {
@@ -141,17 +143,18 @@ namespace ToolBelt
 			closed = true;			
 		}
 
-		/// <summary>
-		/// Throws a NotSupportedException.
-		/// </summary>
-		/// <param name="requestedType">The Type of the object that the new ObjRef will reference.</param>
-		/// <returns>n/a</returns>
-		public override ObjRef CreateObjRef(Type requestedType)
-		{
-			throw new NotSupportedException();
-		}
-
-		/// <summary>
+#if WINDOWS
+        /// <summary>
+        /// Throws a NotSupportedException.
+        /// </summary>
+        /// <param name="requestedType">The Type of the object that the new ObjRef will reference.</param>
+        /// <returns>n/a</returns>
+        public override ObjRef CreateObjRef(Type requestedType)
+        {
+            throw new NotSupportedException();
+        }
+#endif
+        /// <summary>
 		/// Waits for the pending asynchronous read to complete.
 		/// </summary>
 		/// <param name="asyncResult">
@@ -188,6 +191,7 @@ namespace ToolBelt
 			stream.Flush();
 		}
 
+#if WINDOWS
 		/// <summary>
 		/// Throws a NotSupportedException.
 		/// </summary>
@@ -196,6 +200,7 @@ namespace ToolBelt
 		{
 			throw new NotSupportedException();
 		}
+#endif 
 
 		/// <summary>
 		/// Returns the length of the underlying stream.

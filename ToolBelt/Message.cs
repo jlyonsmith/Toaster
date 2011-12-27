@@ -5,13 +5,17 @@ using System.Globalization;
 
 namespace ToolBelt
 {
+#if WINDOWS
     [Serializable]
+#endif
     public class Message
     {
         // Fields
         private object[] array;
         private string name;
+#if WINDOWS
         [NonSerialized]
+#endif
         private ResourceManager rm;
         private Type t;
         private static Dictionary<Type, ResourceManager> resourceManagers = new Dictionary<Type, ResourceManager>();

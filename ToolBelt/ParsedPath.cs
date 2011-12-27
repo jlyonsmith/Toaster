@@ -91,7 +91,9 @@ namespace ToolBelt
     /// <see cref="P:FileAndExtension"/> are always well formed. 
     /// </para>
     /// </remarks>
+#if WINDOWS
     [Serializable]
+#endif
     public class ParsedPath : IComparable
     {
         #region Instance Data
@@ -714,7 +716,7 @@ namespace ToolBelt
             
             while (n < min)
             {
-                if (String.Compare(dirs[n], baseDirs[n], true) != 0)
+                if (String.Compare(dirs[n], baseDirs[n], StringComparison.InvariantCultureIgnoreCase) != 0)
                     break;
                     
                 n++;

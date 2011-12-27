@@ -51,7 +51,7 @@
     DependsOnTargets="PrepareMessageResourceNames">
 
     <!-- Compile the wrapper class -->
-    <Exec Command="$(MSBuildThisFileDirectory)\..\Tools\Buckle.exe %(MessageResxFile.Identity) /n:$(RootNamespace) /w:$(ResourceStringWrapperType) /o:%(MessageResxFile.OutputName)" />
+    <Exec Command="&quot;$(MSBuildExtensionsPath)\ToolBelt\Buckle.exe&quot; %(MessageResxFile.Identity) /n:$(RootNamespace) /w:$(ResourceStringWrapperType) /o:%(MessageResxFile.OutputName)" />
 
     <!-- Compile the resource file -->
     <GenerateResource
