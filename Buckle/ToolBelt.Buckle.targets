@@ -11,6 +11,7 @@
   <PropertyGroup>
     <PrepareResourcesDependsOn>GenerateMessageResources;$(PrepareResourcesDependsOn)</PrepareResourcesDependsOn>
     <CoreCleanDependsOn>$(CoreCleanDependsOn);CleanMessageResources</CoreCleanDependsOn>
+    <BuckleExe Condition="'$(BuckleExe)' == ''">&quot;$(MSBuildExtensionsPath)\ToolBox\Buckle.exe&quot;</BuckleExe>
   </PropertyGroup>
 
   <Target 
@@ -51,7 +52,7 @@
     DependsOnTargets="PrepareMessageResourceNames">
 
     <!-- Compile the wrapper class -->
-    <Exec Command="&quot;$(MSBuildExtensionsPath)\ToolBelt\Buckle.exe&quot; %(MessageResxFile.Identity) /n:$(RootNamespace) /w:$(ResourceStringWrapperType) /o:%(MessageResxFile.OutputName)" />
+    <Exec Command="$(BuckleExe) %(MessageResxFile.Identity) /n:$(RootNamespace) /w:$(ResourceStringWrapperType) /o:%(MessageResxFile.OutputName)" />
 
     <!-- Compile the resource file -->
     <GenerateResource

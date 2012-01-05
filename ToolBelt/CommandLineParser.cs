@@ -392,7 +392,7 @@ namespace ToolBelt
 						{
 							// Look for a public static Parse method on the initializer class
 							System.Reflection.MethodInfo parseMethod = attribute.Initializer.GetMethod(
-								"Parse", BindingFlags.Public | BindingFlags.Static, null,
+                                this.attribute.MethodName, BindingFlags.Public | BindingFlags.Static, null,
 								CallingConventions.Standard, new Type[] { typeof(string) }, null);
 
 							if (parseMethod != null)
@@ -438,7 +438,6 @@ namespace ToolBelt
 						}
 					}
 
-					// TODO-johnls-6/5/2007: This should go after each Invoked call
 					if (newValue == null)
 					{
 						throw new CommandLineArgumentException(CommandLineParserResources.UnableToParseValueForArgument(value, Name));
@@ -2193,6 +2192,7 @@ namespace ToolBelt
 				throw new ArgumentNullException("name");
 			
 			this.Name = name;
+            this.MethodName = "Parse"; // Default
 		}
 
 		#endregion
@@ -2220,13 +2220,20 @@ namespace ToolBelt
 		/// </summary>
 		public string ValueHint { get; set; }
 
-		/// <summary>
-		/// Gets or sets the initializer type.  This is a class that contains an <code>object Parse(object value)</code> method that 
-		/// is passed the command line value and returns a value compatible with the target property.
-		/// </summary>
-		public Type Initializer { get; set; }
+        /// <summary>
+        /// Gets or sets the initializer type.  This is a class that contains a <code>object Parse(object value)</code> method that 
+        /// is passed the command line value and returns a value compatible with the target property.  The name of this method 
+        /// can be overridden with the <see cref="MethodName"/> property.
+        /// </summary>
+        public Type Initializer { get; set; }
 
-		/// <summary>
+        /// <summary>
+        /// Gets or sets the initializer method name.  The method must be static, take a single <code>string</code> parameter and 
+        /// return a value that is the same type as the target command line property.
+        /// </summary>
+        public string MethodName { get; set; }
+
+        /// <summary>
 		/// Gets or sets the commands associated with this argument
 		/// </summary>
 		public string Commands { get; set; }

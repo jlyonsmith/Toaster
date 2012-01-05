@@ -5,8 +5,6 @@ using System.Text.RegularExpressions;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-// TODO: Cache the various combinations of directory parts?
-
 namespace ToolBelt
 {
     /// <summary>

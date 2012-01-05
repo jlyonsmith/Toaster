@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- 
+    Use this .targets file for testing Buckle MSBuild integration.  
+    Put it in the $(MSBuildExtensionsPath)\ToolBelt\ directory to redirect to the debug or release build.
+  -->
+  <PropertyGroup>
+    <ToolBeltPath>C:\Projects\ToolBelt\1.4</ToolBeltPath>
+    <BuckleExe>$(ToolBeltPath)\Buckle\bin\$(Configuration)\Buckle.exe</BuckleExe>
+  </PropertyGroup>
+  <Import Project="$(ToolBeltPath)\Buckle\Toolelt.Buckle.targets"/>
+</Project>
