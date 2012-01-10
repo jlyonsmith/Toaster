@@ -8,8 +8,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing;
 using System.Reflection;
+using System.Diagnostics;
 
-namespace Buckle
+namespace Toaster
 {
 	public enum AccessModifier
 	{
@@ -112,7 +113,10 @@ namespace Buckle
 		[CommandLineArgument("access", ShortName = "a", Description = "Resource class access; public or internal", ValueHint = "<public-internal>")]
 		public AccessModifier Modifier { get; set; }
 
-		private CommandLineParser Parser
+        [CommandLineArgument("nologo", Description = "Suppresses the logo and banner", ValueHint = "<bool>")]
+        public bool NoLogo { get; set; }
+
+		public CommandLineParser Parser
 		{
 			get
 			{
@@ -130,11 +134,15 @@ namespace Buckle
 		#region Methods
 		public void Execute()
 		{
-			Output.Message(Parser.LogoBanner);
+            if (!NoLogo)
+            {
+                Output.Message(Parser.LogoBanner);
+            }
 		
 			if (!runningFromCommandLine)
 			{
-				Output.Message(Parser.ProcessName + Parser.Arguments);
+                Parser.GetTargetArguments(this);
+				Output.Message(MessageImportance.Normal, Parser.CommandName + Parser.Arguments);
 			}
 		
 			if (ResXFileName == null)

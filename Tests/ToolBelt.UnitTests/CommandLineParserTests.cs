@@ -614,9 +614,6 @@ namespace ToolBelt.UnitTests
 				@"Syntax:\s*.+? \[switches\] <default>\r\n\r\nDescription:\s*.*\r\n\r\nSwitches:\r\n\r\n(^(/\w+)|(\s+).*\r\n)+(.*\r\n)+",
 				RegexOptions.Multiline | RegexOptions.ExplicitCapture));
 			
-			// Test late assignment of other usage related strings	
-			Assert.AreEqual(parser.TaskName, "argumentsbasic");
-			
 			parser.CommandName = "AnythingYouWant";
 			
 			Assert.AreEqual(parser.CommandName, "AnythingYouWant");

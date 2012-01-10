@@ -11,8 +11,10 @@
   <PropertyGroup>
     <PrepareResourcesDependsOn>GenerateMessageResources;$(PrepareResourcesDependsOn)</PrepareResourcesDependsOn>
     <CoreCleanDependsOn>$(CoreCleanDependsOn);CleanMessageResources</CoreCleanDependsOn>
-    <BuckleExe Condition="'$(BuckleExe)' == ''">&quot;$(MSBuildExtensionsPath)\ToolBox\Buckle.exe&quot;</BuckleExe>
+    <ToasterAssemblyFile Condition="'$(ToasterAssemblyFile)' == ''">$(MSBuildExtensionsPath)\Toaster\Toaster.dll</ToasterAssemblyFile>
   </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(ToasterAssemblyFile)" TaskName="Buckle" />
 
   <Target 
     Name="CleanMessageResources" 
@@ -52,7 +54,7 @@
     DependsOnTargets="PrepareMessageResourceNames">
 
     <!-- Compile the wrapper class -->
-    <Exec Command="$(BuckleExe) %(MessageResxFile.Identity) /n:$(RootNamespace) /w:$(ResourceStringWrapperType) /o:%(MessageResxFile.OutputName)" />
+    <Buckle ResXFileName="%(MessageResxFile.Identity)" Namespace="$(RootNamespace)" WrapperClass="$(ResourceStringWrapperType)" OutputFileName="%(MessageResxFile.OutputName)" />
 
     <!-- Compile the resource file -->
     <GenerateResource

@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Command_Lowercase" xml:space="preserve">
     <value>command</value>
@@ -148,7 +148,7 @@
     <value>Invalid value {0} for command line argument '{1}'. Valid values are: {2}</value>
   </data>
   <data name="NoWayToInitializeTypeFromString" xml:space="preserve">
-    <value>No way found to initialize type '{0}' from a string</value>
+    <value>No way found to initialize type '{0}' for argument '{1}' from a string</value>
   </data>
   <data name="Number_Lowercase" xml:space="preserve">
     <value>number</value>
@@ -188,9 +188,6 @@
   </data>
   <data name="TypeNotDerivedFromType" xml:space="preserve">
     <value>Type '{0}' is not derived from type '{1}'</value>
-  </data>
-  <data name="UnableToParseValueForArgument" xml:space="preserve">
-    <value>Unable to parse value '{0}' for command line argument '{1}'</value>
   </data>
   <data name="UnknownArgument" xml:space="preserve">
     <value>Unknown or invalid argument '{0}'</value>

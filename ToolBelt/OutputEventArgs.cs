@@ -6,62 +6,62 @@ namespace ToolBelt
     [Serializable]
     public abstract class OutputEventArgs : EventArgs
     {
-        private string _message;
-        private int _threadId;
-        private DateTime _timestamp;
+        private string message;
+        private int threadId;
+        private DateTime timestamp;
 
         protected OutputEventArgs() { }
         protected OutputEventArgs(string message)
         {
-            _timestamp = DateTime.Now;
+            this.timestamp = DateTime.Now;
             // A sneaky way to get the current thread ID
-            _threadId = Thread.CurrentThread.GetHashCode();
-            _message = message;
+            this.threadId = Thread.CurrentThread.GetHashCode();
+            this.message = message;
         }
 
-        public string Message { get { return _message; } }
-        public int ThreadId { get { return _threadId; } }
-        public DateTime Timestamp { get { return _timestamp; } }
+        public string Message { get { return message; } }
+        public int ThreadId { get { return threadId; } }
+        public DateTime Timestamp { get { return timestamp; } }
     }
 
     [Serializable]
     public class OutputErrorEventArgs : OutputEventArgs
     {
-        private string _code;
+        private string code;
 
         public OutputErrorEventArgs() { }
         public OutputErrorEventArgs(string message) : base(message) { }
         public OutputErrorEventArgs(string message, string code)
             : base(message)
         {
-            _code = code;
+            this.code = code;
         }
 
-        public string Code { get { return _code; } }
+        public string Code { get { return code; } }
     }
 
     [Serializable]
     public class OutputWarningEventArgs : OutputEventArgs
     {
-        private string _code;
+        private string code;
 
         public OutputWarningEventArgs() { }
         public OutputWarningEventArgs(string message) : base(message) { }
         public OutputWarningEventArgs(string message, string code)
             : base(message)
         {
-            _code = code;
+            this.code = code;
         }
 
-        public string Code { get { return _code; } }
+        public string Code { get { return code; } }
     }
 
     [Serializable]
     public enum MessageImportance
     {
-        High,
-        Normal,
-        Low
+        High = 0,
+        Normal = 1,
+        Low = 2
     }
 
     [Serializable]

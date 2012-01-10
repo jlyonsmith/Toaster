@@ -346,7 +346,27 @@ namespace ToolBelt
 			
 			try
 			{
-				if (ValueType == typeof(string))
+				// If there is an initializer type/method use it 
+				if (this.attribute.Initializer != null)
+				{
+					// Look for a public static Parse method on the initializer class
+					System.Reflection.MethodInfo parseMethod = attribute.Initializer.GetMethod(
+                        this.attribute.MethodName, BindingFlags.Public | BindingFlags.Static, null,
+						CallingConventions.Standard, new Type[] { typeof(string) }, null);
+
+					if (parseMethod != null)
+					{
+						// Call the Parse method
+						newValue = parseMethod.Invoke(null, BindingFlags.Default, null,
+							new object[] { value }, CultureInfo.InvariantCulture);
+					}
+					else
+					{
+						throw new CommandLineArgumentException(
+							CommandLineParserResources.InvalidInitializerClassForCommandLineArgument(attribute.Initializer.ToString(), Name));
+					}
+				}
+				else if (ValueType == typeof(string))
 				{
 					newValue = value;
 				}
@@ -361,88 +381,58 @@ namespace ToolBelt
 						newValue = (object)false;
 					}
 				}
-				else
+				else if (ValueType.IsEnum)
 				{
-					if (ValueType.IsEnum)
+					try
 					{
-						try
-						{
-							newValue = Enum.Parse(ValueType, value, true);
-						}
-						catch (ArgumentException ex)
-						{
-							string s = String.Empty;
-							
-							foreach (object obj in Enum.GetValues(ValueType))
-							{
-								s += obj.ToString() + ", ";
-							}
-							
-							// strip last ,
-							s = s.Substring(0, s.Length - 2) + ".";
-							
-							throw new CommandLineArgumentException(
-								CommandLineParserResources.InvalidValueForCommandLineArgumentWithValid(value, Name, s), ex);
-						}
+						newValue = Enum.Parse(ValueType, value, true);
 					}
-					else
+					catch (ArgumentException ex)
 					{
-						// If there is an initializer class... 
-						if (this.attribute.Initializer != null)
+						string s = String.Empty;
+							
+						foreach (object obj in Enum.GetValues(ValueType))
 						{
-							// Look for a public static Parse method on the initializer class
-							System.Reflection.MethodInfo parseMethod = attribute.Initializer.GetMethod(
-                                this.attribute.MethodName, BindingFlags.Public | BindingFlags.Static, null,
-								CallingConventions.Standard, new Type[] { typeof(string) }, null);
-
-							if (parseMethod != null)
-							{
-								// Call the Parse method
-								newValue = parseMethod.Invoke(null, BindingFlags.Default, null,
-									new object[] { value }, CultureInfo.InvariantCulture);
-							}
-							else
-							{
-								throw new CommandLineArgumentException(
-									CommandLineParserResources.InvalidInitializerClassForCommandLineArgument(attribute.Initializer.ToString(), Name));
-							}
+							s += obj.ToString() + ", ";
 						}
-						else
-						{
-							// Look for a public static Parse method on the type of the property
-							System.Reflection.MethodInfo parseMethod = ValueType.GetMethod(
-								"Parse", BindingFlags.Public | BindingFlags.Static, null,
-								CallingConventions.Standard, new Type[] { typeof(string) }, null);
-
-							if (parseMethod != null)
-							{
-								// Call the Parse method
-								newValue = parseMethod.Invoke(null, BindingFlags.Default, null,
-									new object[] { value}, CultureInfo.InvariantCulture);
-							}
-							else if (ValueType.IsClass)
-							{
-								// Search for a constructor that takes a string argument
-								ConstructorInfo stringArgumentConstructor =
-									ValueType.GetConstructor(new Type[] { typeof(string) });
-
-								if (stringArgumentConstructor != null)
-								{
-									newValue = stringArgumentConstructor.Invoke(BindingFlags.Default, null, new object[] { value }, CultureInfo.InvariantCulture);
-								}
-							}
-							else
-							{
-								throw new CommandLineArgumentException(CommandLineParserResources.NoWayToInitializeTypeFromString(Name));
-							}
-						}
-					}
-
-					if (newValue == null)
-					{
-						throw new CommandLineArgumentException(CommandLineParserResources.UnableToParseValueForArgument(value, Name));
+							
+						// strip last ,
+						s = s.Substring(0, s.Length - 2) + ".";
+							
+						throw new CommandLineArgumentException(
+							CommandLineParserResources.InvalidValueForCommandLineArgumentWithValid(value, Name, s), ex);
 					}
 				}
+                else
+                {
+                    // Look for a public static Parse method on the type of the property
+                    System.Reflection.MethodInfo parseMethod = ValueType.GetMethod(
+                        "Parse", BindingFlags.Public | BindingFlags.Static, null,
+                        CallingConventions.Standard, new Type[] { typeof(string) }, null);
+
+                    if (parseMethod != null)
+                    {
+                        // Call the Parse method
+                        newValue = parseMethod.Invoke(null, BindingFlags.Default, null,
+                            new object[] { value }, CultureInfo.InvariantCulture);
+                    }
+                    else if (ValueType.IsClass)
+                    {
+                        // Search for a constructor that takes a string argument
+                        ConstructorInfo stringArgumentConstructor =
+                            ValueType.GetConstructor(new Type[] { typeof(string) });
+
+                        if (stringArgumentConstructor != null)
+                        {
+                            newValue = stringArgumentConstructor.Invoke(BindingFlags.Default, null, new object[] { value }, CultureInfo.InvariantCulture);
+                        }
+                    }
+                }
+
+				if (newValue == null)
+				{
+                    throw new CommandLineArgumentException(CommandLineParserResources.NoWayToInitializeTypeFromString(value, Name));
+                }
 			}
 			catch (Exception e)
 			{
@@ -499,15 +489,11 @@ namespace ToolBelt
 					{
 						sb.AppendFormat(CultureInfo.InvariantCulture, "/{0}{1}{2}", Name, (bool)value ? "+" : "-", more ? " " : "");
 					}
-					else if (ValueType == typeof(string))
+					else 
 					{
 						bool quote = (value.ToString().IndexOf(' ') != -1);
 
-						sb.AppendFormat(CultureInfo.InvariantCulture, quote ? "\"/{0}:{1}\"{2}" : "/{0}:{1}{2}", Name, value, more ? " " : "");
-					}
-					else
-					{
-						sb.AppendFormat(CultureInfo.InvariantCulture, "/{0}:{1}{2}", Name, value, more ? " " : "");
+                        sb.AppendFormat(CultureInfo.InvariantCulture, quote ? "/{0}:\"{1}\"{2}" : "/{0}:{1}{2}", Name, value, more ? " " : "");
 					}
 				}
 				
@@ -737,25 +723,6 @@ namespace ToolBelt
 			set
 			{
 				commandName = value;
-			}
-		}
-
-		/// <summary>
-		/// Gets the name for the MSBuild task, which is the name of the argument specification class.
-		/// </summary>
-		public string TaskName
-		{
-			get
-			{
-				if (taskName == null)
-				{
-					string fullTypeName = argumentSpecificationType.ToString();
-					int n = fullTypeName.LastIndexOfAny(new char[] {'.', '+'});
-					
-					taskName = fullTypeName.Substring(n == -1 ? 0 : n + 1).ToLower(CultureInfo.InvariantCulture);
-				}
-				
-				return taskName;
 			}
 		}
 
@@ -1903,7 +1870,6 @@ namespace ToolBelt
 		private string version;
 		private string title;
 		private string description;
-		private string taskName;
 		private string commandName;
 		private Stack<string> responseFiles;
 		private const int maxResponseFileDepth = 10;
