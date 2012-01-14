@@ -485,8 +485,6 @@ namespace ToolBelt
 
         #endregion
 
-
-
         #region Instance Methods
 
         /// <summary>
