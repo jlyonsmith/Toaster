@@ -25,29 +25,30 @@ namespace ToolBelt
 
         #region IOutputter Members
 
-        public void OutputCustomEvent(OutputCustomEventArgs e)
+        public void OutputCustomEvent(OutputCustomEventArgs args)
         {
         }
 
-        public void OutputErrorEvent(OutputErrorEventArgs e)
+        public void OutputErrorEvent(OutputErrorEventArgs args)
         {
-            BuildErrorEventArgs args = new BuildErrorEventArgs(
-                "", e.Code, "", 0, 0, 0, 0, e.Message, "", taskName, e.Timestamp, null);
-            buildEngine.LogErrorEvent(args);
+            buildEngine.LogErrorEvent(new BuildErrorEventArgs(
+                args.SubCategory, args.Code, args.File, 
+                args.LineNumber, args.ColumnNumber, args.EndLineNumber, args.EndColumnNumber, 
+                args.Message, args.HelpKeyword, taskName, args.Timestamp, null));
         }
 
-        public void OutputWarningEvent(OutputWarningEventArgs e)
+        public void OutputWarningEvent(OutputWarningEventArgs args)
         {
-            BuildWarningEventArgs args = new BuildWarningEventArgs(
-                "", e.Code, "", 0, 0, 0, 0, e.Message, "", taskName, e.Timestamp, null); 
-            buildEngine.LogWarningEvent(args);
+            buildEngine.LogWarningEvent(new BuildWarningEventArgs(
+                args.SubCategory, args.Code, args.File,
+                args.LineNumber, args.ColumnNumber, args.EndLineNumber, args.EndColumnNumber,
+                args.Message, "", args.SenderName, args.Timestamp, null));
         }
 
-        public void OutputMessageEvent(OutputMessageEventArgs e)
+        public void OutputMessageEvent(OutputMessageEventArgs args)
         {
-            BuildMessageEventArgs args = new BuildMessageEventArgs(
-                e.Message, "", taskName, (Microsoft.Build.Framework.MessageImportance)(int)e.Importance);
-            buildEngine.LogMessageEvent(args);
+            buildEngine.LogMessageEvent(new BuildMessageEventArgs(
+                args.Message, args.HelpKeyword, taskName, (Microsoft.Build.Framework.MessageImportance)(int)args.Importance));
         }
 
         #endregion

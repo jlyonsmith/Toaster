@@ -44,6 +44,12 @@ namespace ToolBelt
             try
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+
+                if (!String.IsNullOrEmpty(e.File))
+                {
+                    writer.Write("{0}({1}): ", e.File, e.LineNumber);
+                }
+
                 writer.Write(OutputterResources.Error, e.Code);
                 writer.WriteLine(e.Message);
             }
@@ -62,6 +68,12 @@ namespace ToolBelt
             try
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
+
+                if (!String.IsNullOrEmpty(e.File))
+                {
+                    writer.Write("{0}({1}): ", e.File, e.LineNumber);
+                }
+
                 writer.Write(OutputterResources.Warning, e.Code);
                 writer.WriteLine(e.Message);
             }

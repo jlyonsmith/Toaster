@@ -11,7 +11,6 @@ namespace ToolBelt
         private bool hasOutputErrors;
         private ResourceManager resourceManager;
         private bool warningsAsErrors;
-        private static Regex prefixRegex = new Regex(@"^\s*([A-Za-z]+\d+):\s*(.*)");
 
         #endregion
 
@@ -28,25 +27,6 @@ namespace ToolBelt
             this.resourceManager = resourceManager;
             this.hasOutputErrors = false;
             this.warningsAsErrors = false;
-        }
-
-        #endregion
-
-        #region Private Methods
-        public static string ExtractMessageCode(string messageIn, out string messageOut)
-        {
-            Match match = prefixRegex.Match(messageIn);
-
-            if (match.Success)
-            {
-                messageOut = match.Groups[2].Value;
-                return match.Groups[1].Value;
-            }
-            else
-            {
-                messageOut = messageIn;
-                return null;
-            }
         }
 
         #endregion
@@ -79,15 +59,52 @@ namespace ToolBelt
 
         public void Message(MessageImportance importance, string message, params object[] messageArgs)
         {
-            OutputMessageEventArgs e = new OutputMessageEventArgs(StringUtility.CultureFormat(message, messageArgs), importance);
-
-            this.outputter.OutputMessageEvent(e);
+            this.outputter.OutputMessageEvent(new OutputMessageEventArgs(importance, StringUtility.CultureFormat(message, messageArgs)));
         }
 
         public void Error(string message, params object[] messageArgs)
         {
-            string code = ExtractMessageCode(message, out message);
-            OutputErrorEventArgs e = new OutputErrorEventArgs(StringUtility.CultureFormat(message, messageArgs), code);
+            Error("", 0, 0, message, messageArgs);
+        }
+
+        public void Error(
+            string file,
+            int lineNumber,
+            int columnNumber,
+            string message,
+            params object[] messageArgs)
+        {
+            Error("", "", file, lineNumber, columnNumber, 0, 0, "", "", DateTime.Now, 0, message, messageArgs);
+        }
+
+        public void Error(
+            string subcategory,
+            string code,
+            string file,
+            int lineNumber,
+            int columnNumber,
+            int endLineNumber,
+            int endColumnNumber,
+            string helpKeyword,
+            string senderName,
+            DateTime timestamp,
+            int threadId, 
+            string message, 
+            params object[] messageArgs)
+        {
+            OutputErrorEventArgs e = new OutputErrorEventArgs(
+                subcategory, 
+                code,
+                file,
+                lineNumber, 
+                columnNumber,
+                endLineNumber,
+                endColumnNumber,
+                helpKeyword,
+                senderName,
+                timestamp,
+                threadId,
+                StringUtility.CultureFormat(message, messageArgs));
 
             this.hasOutputErrors = true;
 
@@ -96,14 +113,66 @@ namespace ToolBelt
 
         public void Warning(string message, params object[] messageArgs)
         {
+            Warning("", 0, 0, message, messageArgs);
+        }
+
+        public void Warning(
+            string file,
+            int lineNumber,
+            int columnNumber,
+            string message,
+            params object[] messageArgs)
+        {
+            Warning("", "", file, lineNumber, columnNumber, 0, 0, "", "", DateTime.Now, 0, message, messageArgs);
+        }
+
+        public void Warning(
+            string subcategory,
+            string code,
+            string file,
+            int lineNumber,
+            int columnNumber,
+            int endLineNumber,
+            int endColumnNumber,
+            string helpKeyword,
+            string senderName,
+            DateTime timestamp,
+            int threadId,
+            string message,
+            params object[] messageArgs)
+        {
             if (warningsAsErrors)
             {
-                Error(message, messageArgs);
+                Error(
+                    subcategory,
+                    code,
+                    file,
+                    lineNumber,
+                    columnNumber,
+                    endLineNumber,
+                    endColumnNumber,
+                    helpKeyword,
+                    senderName,
+                    timestamp,
+                    threadId,
+                    message,
+                    messageArgs);
                 return;
             }
 
-            string code = ExtractMessageCode(message, out message);
-            OutputWarningEventArgs e = new OutputWarningEventArgs(StringUtility.CultureFormat(message, messageArgs), code);
+            OutputWarningEventArgs e = new OutputWarningEventArgs(
+                subcategory,
+                code,
+                file,
+                lineNumber,
+                columnNumber,
+                endLineNumber,
+                endColumnNumber,
+                helpKeyword,
+                senderName,
+                timestamp,
+                threadId,
+                StringUtility.CultureFormat(message, messageArgs));
 
             this.outputter.OutputWarningEvent(e);
         }
