@@ -9,7 +9,7 @@
 ///   <ref>$(FxReferenceAssemblyPath)System.dll</ref>
 ///   <ref>$(FxReferenceAssemblyPath)System.Xml.dll</ref>
 ///   <ref>$(CodeRunnerPath)CodeRunner.dll</ref>
-///   <ref>$(CodeRunnerPath)ToolBelt.dll</ref>
+///   <ref>$(CodeRunnerPath)ToolBelt.1.5.dll</ref>
 ///  </refs>
 /// </script>
 

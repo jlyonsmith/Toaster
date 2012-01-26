@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ToolBelt</RootNamespace>
-    <AssemblyName>ToolBelt.1.5</AssemblyName>
+    <AssemblyName>ToolBelt</AssemblyName>
     <ResourceStringWrapperType>ToolBelt.Message</ResourceStringWrapperType>
     <AssemblyOriginatorKeyFile>..\ToolBelt.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>

@@ -11,7 +11,7 @@ namespace ToolBelt.UnitTests
 {
 	[TestClass]
 #if USE_TOASTER
-    [DeploymentItem(@"$(SolutionDir)Tests\CommandTestProgram\bin\$(Configuration)\CommandTestProgram.exe")]
+    [DeploymentItem(@"$(SolutionRoot)\Tests\CommandTestProgram\bin\$(Configuration)\CommandTestProgram.exe")]
 #else
     [DeploymentItem(@"Tests\CommandTestProgram\bin\Debug\CommandTestProgram.exe")]
 #endif

@@ -1,12 +1,14 @@
 @echo off
 setlocal
-set SOLUTIONROOT=c:\inrix\thirdparty\toaster\1.3
+call SetSlnRoot.bat
 set CONFIGURATION=Debug
-copy %SOLUTIONROOT%\Toast\bin\%CONFIGURATION%\Toast.exe TestDeployment
-copy %SOLUTIONROOT%\Toast\bin\%CONFIGURATION%\Toast.pdb TestDeployment
-copy %SOLUTIONROOT%\ToolBelt\bin\%CONFIGURATION%\ToolBelt.dll TestDeployment
-copy %SOLUTIONROOT%\ToolBelt\bin\%CONFIGURATION%\ToolBelt.pdb TestDeployment
-copy %SOLUTIONROOT%\Toaster\bin\%CONFIGURATION%\Toaster.dll TestDeployment
-copy %SOLUTIONROOT%\Toaster\bin\%CONFIGURATION%\Toaster.pdb TestDeployment
-TestDeployment\toast.exe %SOLUTIONROOT%\Tests\ToolBelt.UnitTests\bin\%CONFIGURATION%\ToolBelt.UnitTests.dll /dd:%SOLUTIONROOT%\TestDeployment %*
+set TESTDIR=%SOLUTIONROOT%\TestDeployment
+md %TESTDIR%
+copy %SOLUTIONROOT%\Toast\bin\%CONFIGURATION%\Toast.exe %TESTDIR%
+copy %SOLUTIONROOT%\Toast\bin\%CONFIGURATION%\Toast.pdb %TESTDIR%
+copy %SOLUTIONROOT%\ToolBelt\bin\%CONFIGURATION%\ToolBelt.dll %TESTDIR%
+copy %SOLUTIONROOT%\ToolBelt\bin\%CONFIGURATION%\ToolBelt.pdb %TESTDIR%
+copy %SOLUTIONROOT%\Toaster\bin\%CONFIGURATION%\Toaster.dll %TESTDIR%
+copy %SOLUTIONROOT%\Toaster\bin\%CONFIGURATION%\Toaster.pdb %TESTDIR%
+%TESTDIR%\toast.exe %SOLUTIONROOT%\Tests\ToolBelt.UnitTests\bin\%CONFIGURATION%\ToolBelt.UnitTests.dll -dd:%TESTDIR% -o:%TESTDIR%\TestResults.testresults %*
 endlocal

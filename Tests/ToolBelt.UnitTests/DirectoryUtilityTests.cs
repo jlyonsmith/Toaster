@@ -76,7 +76,7 @@ namespace ToolBelt.UnitTests
                 testDirs[0] + "*.*", SearchScope.RecurseSubDirectoriesBreadthFirst);
 
             Assert.IsTrue(files.Length == 10);
-            Assert.IsTrue(files[files.Length - 1].EndsWith("child221"));
+            Assert.IsTrue(Path.GetDirectoryName(files[files.Length - 1]).EndsWith("child221"));
 
             foreach (string file in files)
             {
@@ -87,7 +87,7 @@ namespace ToolBelt.UnitTests
                 testDirs[0] + "*.*", SearchScope.RecurseSubDirectoriesDepthFirst);
 
             Assert.IsTrue(files.Length == 10);
-            Assert.IsTrue(files[files.Length - 1].EndsWith("root"));
+            Assert.IsTrue(Path.GetDirectoryName(files[files.Length - 1]).EndsWith("root"));
 
             foreach (string file in files)
             {

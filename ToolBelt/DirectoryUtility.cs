@@ -47,7 +47,7 @@ namespace ToolBelt
             string[] files = new string[fileInfos.Length];
 
             for (int i = 0; i < fileInfos.Length; i++)
-                files[i] = fileInfos[i].DirectoryName;
+                files[i] = fileInfos[i].FullName;
 
             return files;
 		}
