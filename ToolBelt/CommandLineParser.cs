@@ -372,14 +372,7 @@ namespace ToolBelt
 				}
 				else if (ValueType == typeof(bool))
 				{
-					if (value == null || value == "+")
-					{
-						newValue = (object)true;
-					}
-					else if (value == "-")
-					{
-						newValue = (object)false;
-					}
+					newValue = (object)true;
 				}
 				else if (ValueType.IsEnum)
 				{
@@ -484,16 +477,18 @@ namespace ToolBelt
 					object value = enumerator.Current;
 					
 					more = enumerator.MoveNext();
-				
-					if (ValueType == typeof(bool))
+
+                    if (ValueType == typeof(bool))
 					{
-						sb.AppendFormat(CultureInfo.InvariantCulture, "/{0}{1}{2}", Name, (bool)value ? "+" : "-", more ? " " : "");
+                        // Only append a boolean flag if it's true
+                        if ((bool)value)
+						    sb.AppendFormat(CultureInfo.InvariantCulture, "-{0}{1}", Name, more ? " " : "");
 					}
 					else 
 					{
 						bool quote = (value.ToString().IndexOf(' ') != -1);
 
-                        sb.AppendFormat(CultureInfo.InvariantCulture, quote ? "/{0}:\"{1}\"{2}" : "/{0}:{1}{2}", Name, value, more ? " " : "");
+                        sb.AppendFormat(CultureInfo.InvariantCulture, quote ? "-{0}:\"{1}\"{2}" : "-{0}:{1}{2}", Name, value, more ? " " : "");
 					}
 				}
 				
@@ -1582,10 +1577,6 @@ namespace ToolBelt
 				{
 					valueText = ":<" + CommandLineParserResources.Text_LowerCase + ">";
 				}
-				else if (argument.ValueType == typeof(bool))
-				{
-					valueText = "[+|-]";
-				}
 				else if (
 					argument.ValueType == typeof(FileInfo) ||
 					argument.ValueType == typeof(ParsedPath))
@@ -1613,7 +1604,7 @@ namespace ToolBelt
 					name = name.Insert(shortName.Length, "[") + "]";
 				}
 
-				string sw = "/" + name + valueText;
+				string sw = "-" + name + valueText;
 
 				switches.Add(new KeyValuePair<CommandLineArgument,string>(argument, sw));
 			}

@@ -138,7 +138,7 @@ namespace ToolBelt.UnitTests
 				set { arg6 = value; }
 			}
 
-			[CommandLineArgument("arg7", Description = "Argument #7", Initializer = typeof(CustomTypeInitializer))]
+			[CommandLineArgument("arg7", Description = "Argument #7", Initializer = typeof(CustomTypeInitializer), MethodName="Parse")]
 			public CustomType Arg7
 			{
 				get { return arg7; }
@@ -397,17 +397,16 @@ namespace ToolBelt.UnitTests
 			CommandLineParser parser = new CommandLineParser(typeof(ArgumentsBasic), null, CommandLineParserFlags.None);
 			string[] args = new string[] 
 			{ 
-				"/arg1:valueForArg1", 
-				"/a2:One", 
-				"/arg2:Two", 
-				"/arg3:Alpha", 
-				"/arg3:Beta", 
-				"/arg4+", 
-				"/arg5:10", 
-				"/arg6-", 
-				"/arg7:a=1;b=2",
-				"/arg8:blah.txt",
-				"/arg9:blah.txt",
+				"-arg1:valueForArg1", 
+				"-a2:One", 
+				"-arg2:Two", 
+				"-arg3:Alpha", 
+				"-arg3:Beta", 
+				"-arg4+", 
+				"-arg5:10", 
+				"-arg7:a=1;b=2",
+				"-arg8:blah.txt",
+				"-arg9:blah.txt",
 				"something.txt"				
 			};
 			
@@ -423,8 +422,8 @@ namespace ToolBelt.UnitTests
 				{ new KeyValuePair<string, string>("a", "1"), new KeyValuePair<string, string>("b", "2") }, target.Arg7.Parameters);
 			Assert.AreEqual("blah.txt", target.Arg8.ToString());
 			Assert.AreEqual("blah.txt", target.Arg9.ToString());
-			Assert.AreEqual(12, parser.ArgumentCount);
-			Assert.AreEqual(" /arg1:valueForArg1 /arg2:One /arg2:Two /arg3:Alpha /arg3:Beta /arg4+ /arg5:10 /arg6- /arg7:a=1;b=2 /arg8:blah.txt /arg9:blah.txt something.txt", parser.Arguments);
+			Assert.AreEqual(11, parser.ArgumentCount);
+			Assert.AreEqual(" -arg1:valueForArg1 -arg2:One -arg2:Two -arg3:Alpha -arg3:Beta -arg4 -arg5:10 -arg7:a=1;b=2 -arg8:blah.txt -arg9:blah.txt something.txt", parser.Arguments);
 		}
 
 		[TestMethod]
@@ -460,7 +459,7 @@ namespace ToolBelt.UnitTests
 			// NOTE: Not setting arguments #10 and #11
 
 			Assert.AreEqual(13, parser.ArgumentCount);
-			Assert.AreEqual(" /arg1:valueForArg1 /arg2:One /arg2:Two /arg3:Alpha /arg3:Beta /arg4+ /arg5:10 /arg6- /arg7:a=1;b=2 /arg8:blah.txt /arg9:blah.txt /arg11:0 something.txt", parser.Arguments);
+			Assert.AreEqual(" -arg1:valueForArg1 -arg2:One -arg2:Two -arg3:Alpha -arg3:Beta -arg4 -arg5:10 -arg7:a=1;b=2 -arg8:blah.txt -arg9:blah.txt -arg11:0 something.txt", parser.Arguments);
 		}
 		
 		[TestMethod]
@@ -690,13 +689,13 @@ namespace ToolBelt.UnitTests
 		{
 			ArgumentsFromResources target = new ArgumentsFromResources();
 			CommandLineParser parser = new CommandLineParser(typeof(ArgumentsFromResources), typeof(CommandLineParserTestsResources));
-			string[] args = new string[] { "/a:file.txt" };
+			string[] args = new string[] { "-a:file.txt" };
 
 			parser.ParseAndSetTarget(args, target);
 
 			Assert.AreEqual("file.txt", target.File);
 			Assert.IsTrue(Regex.IsMatch(parser.Usage,
-				@"Syntax:\s+.+? \[switches\]\r\n\r\nSwitches:\r\n\r\n(^  /\w+.*)",
+				@"Syntax:\s+.+? \[switches\]\r\n\r\nSwitches:\r\n\r\n(^  -\w+.*)",
 				RegexOptions.Multiline | RegexOptions.ExplicitCapture));
 		}
 #endif
