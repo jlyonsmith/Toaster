@@ -94,14 +94,15 @@ namespace ToolBelt
 #endif
     public class ParsedPath : IComparable
     {
-        #region Instance Data
-        
-        private string machine = String.Empty;
-        private string share = String.Empty;
-        private string drive = String.Empty;
-        private string dir = String.Empty;
-        private string fname = String.Empty;
-        private string ext = String.Empty;
+        #region Fields
+
+        private string path;
+        private short machineLength;
+        private short shareLength;
+        private short driveLength;
+        private short dirLength;
+        private short fileLength;
+        private short extLength;
 
         #endregion
 
@@ -154,16 +155,6 @@ namespace ToolBelt
         {
         }
 
-        private ParsedPath(string machine, string share, string drive, string dir, string fname, string ext)
-        {
-            this.machine = machine ?? String.Empty;
-            this.share = share ?? String.Empty;
-            this.drive = drive ?? String.Empty;
-            this.dir = dir ?? String.Empty;
-            this.fname = fname ?? String.Empty;
-            this.ext = ext ?? String.Empty;
-        }
-
         /// <summary>
         /// Initializes an instance of the <see cref="T:ParsedPath"/> class by parsing the given file 
         /// system path into its constituent parts.
@@ -174,6 +165,13 @@ namespace ToolBelt
         /// <param name="typeHint">See <see cref="T:PathType"/> for a list of path type hints</param>
         public ParsedPath(string path, PathType typeHint)
         {
+            string machine = String.Empty;
+            string share = String.Empty;
+            string drive = String.Empty;
+            string dir = String.Empty;
+            string file = String.Empty;
+            string ext = String.Empty;
+
             // Null reference is bad
             if (path == null)
                 throw new ArgumentNullException("path");
@@ -205,7 +203,7 @@ namespace ToolBelt
             bool isUnc = false;
             bool autoTypeHint = (typeHint == PathType.Automatic);
 
-            if (path.StartsWith(PathUtility.UncPrefixChars, StringComparison.CurrentCultureIgnoreCase))
+            if (path.StartsWith(PathUtility.UncPrefixChars, StringComparison.InvariantCultureIgnoreCase))
             {
                 i = 0;
                 
@@ -238,7 +236,7 @@ namespace ToolBelt
 
                 share = path.Substring(i, j - i);
 
-                if (typeHint == PathType.Automatic && path.Length == Volume.ToString().Length)
+                if (typeHint == PathType.Automatic && path.Length == machine.Length + share.Length)
                     typeHint = PathType.Volume;
                     
                 isUnc = true;
@@ -288,25 +286,25 @@ namespace ToolBelt
                 path = path.TrimEnd(BadDirTrailChars);
                 
                 // Chop off the file name
-                fname = path.Substring(i, path.Length - i);
+                file = path.Substring(i, path.Length - i);
 
-                j = fname.LastIndexOf(PathUtility.ExtensionSeparatorChar);
+                j = file.LastIndexOf(PathUtility.ExtensionSeparatorChar);
 
-                if (j != -1 && j + 1 < fname.Length)
+                if (j != -1 && j + 1 < file.Length)
                 {
                     // Chop off the extension which is everything from the last '.' in the file name (if any)
-                    ext = fname.Substring(j);
-                    fname = fname.Substring(0, j);
+                    ext = file.Substring(j);
+                    file = file.Substring(0, j);
                 }
             }
                 
             // Get the directory - it's everything that's left (which may be nothing)
             if (isUnc)
                 dir = path.Substring(machine.Length + share.Length, 
-                    path.Length - machine.Length - share.Length - fname.Length - ext.Length);
+                    path.Length - machine.Length - share.Length - file.Length - ext.Length);
             else
                 dir = path.Substring(drive.Length, 
-                    path.Length - drive.Length - fname.Length - ext.Length);
+                    path.Length - drive.Length - file.Length - ext.Length);
 
             // You have got to have at least a directory if the type hint is to expect a directory
             if (typeHint == PathType.Directory && dir == String.Empty)
@@ -314,12 +312,12 @@ namespace ToolBelt
 
             // You can't have wildcards in the directory part or double '\\' characters in the directory
             if (dir.IndexOfAny(WildcardChars) != -1 ||
-                dir.IndexOf(PathUtility.UncPrefixChars, StringComparison.CurrentCultureIgnoreCase) != -1)
+                dir.IndexOf(PathUtility.UncPrefixChars, StringComparison.InvariantCultureIgnoreCase) != -1)
                 throw new ArgumentException("Invalid characters in path");
                 
             // If user wanted a VolumeOnly, validate that we have no directory, file or extension
             if (!autoTypeHint && typeHint == PathType.Volume && 
-                (dir != String.Empty || fname != String.Empty || ext != String.Empty))
+                (dir != String.Empty || file != String.Empty || ext != String.Empty))
                 throw new ArgumentException("Path contains more than just a volume");
 
             // Now we go through the directory and remove trailing space/dot combinations
@@ -366,10 +364,18 @@ namespace ToolBelt
             }
             
             dir = sb.ToString();
+
+            this.path = ((machine != String.Empty) ? machine + share : drive) + dir + file + ext;
+            this.machineLength = checked((short)machine.Length);
+            this.shareLength = checked((short)share.Length);
+            this.driveLength = checked((short)drive.Length);
+            this.dirLength = checked((short)dir.Length);
+            this.fileLength = checked((short)file.Length);
+            this.extLength = checked((short)ext.Length);
         }
 
         /// <summary>
-        /// Initializes a <see cref="ParsedPath"/> from another <see cref="ParsedPath"/> thus avoiding the need to reparse the path.
+        /// Initializes a <see cref="ParsedPath"/> from another <see cref="ParsedPath"/> which avoids the need to reparse the path.
         /// </summary>
         /// <param name="path">The source path</param>
         /// <param name="parts">The parts to copy from the source path</param>
@@ -378,109 +384,145 @@ namespace ToolBelt
             switch (parts)
             {
                 case PathParts.Machine:
-                    this.machine = path.machine;
+                    this.machineLength = path.machineLength;
+                    this.path = path.Machine;
                     break;
                 case PathParts.Share:
-                    this.share = path.share;
+                    this.shareLength = path.shareLength;
+                    this.path = path.Share;
                     break;
 
                 case PathParts.Drive:
-                    this.drive = path.drive;
+                    this.driveLength = path.driveLength;
+                    this.path = path.Drive;
                     break;
 
                 case PathParts.Directory:
-                    this.dir = path.dir;
+                    this.dirLength = path.dirLength;
+                    this.path = path.Directory;
                     break;
 
                 case PathParts.File:
-                    this.fname = path.fname;
+                    this.fileLength = path.fileLength;
+                    this.path = path.File;
                     break;
 
                 case PathParts.Extension:
-                    this.ext = path.ext;
+                    this.extLength = path.extLength;
+                    this.path = path.Extension;
                     break;
 
                 case PathParts.Volume:
                     if (path.HasDrive)
                     {
-                        this.drive = path.drive;
+                        this.driveLength = path.driveLength;
+                        this.path = path.Drive;
                     }
                     else
                     {
-                        this.machine = path.machine;
-                        this.share = path.share;
+                        this.machineLength = path.machineLength;
+                        this.shareLength = path.shareLength;
+                        this.path = path.Machine + path.Share;
                     }
                     break;
 
                 case PathParts.Unc:
-                    this.machine = path.machine;
-                    this.share = path.share;
+                    this.machineLength = path.machineLength;
+                    this.shareLength = path.shareLength;
+                    this.path = path.Machine + path.Share;
                     break;
 
                 case PathParts.VolumeAndDirectory:
                     if (path.HasDrive)
                     {
-                        this.drive = path.drive;
-                        this.dir = path.dir;
+                        this.driveLength = path.driveLength;
+                        this.dirLength = path.dirLength;
+                        this.path = path.Drive + path.Directory;
                     }
                     else
                     {
-                        this.machine = path.machine;
-                        this.share = path.share;
-                        this.dir = path.dir;
+                        this.machineLength = path.machineLength;
+                        this.shareLength = path.shareLength;
+                        this.dirLength = path.dirLength;
+                        this.path = path.Machine + path.Share + path.Directory;
                     }
                     break;
 
                 case PathParts.VolumeDirectoryAndFile:
                     if (path.HasDrive)
                     {
-                        this.drive = path.drive;
-                        this.dir = path.dir;
-                        this.fname = path.fname;
+                        this.driveLength = path.driveLength;
+                        this.dirLength = path.dirLength;
+                        this.fileLength = path.fileLength;
+                        this.path = path.Drive + path.Directory + path.File;
                     }
                     else
                     {
-                        this.machine = path.machine;
-                        this.share = path.share;
-                        this.dir = path.dir;
-                        this.fname = path.fname;
+                        this.machineLength = path.machineLength;
+                        this.shareLength = path.shareLength;
+                        this.dirLength = path.dirLength;
+                        this.fileLength = path.fileLength;
+                        this.path = path.Machine + path.Share + path.Directory + path.File;
                     }
                     break;
 
                 case PathParts.DirectoryAndFile:
-                    this.dir = path.dir;
-                    this.fname = path.fname;
+                    this.dirLength = path.dirLength;
+                    this.fileLength = path.fileLength;
+                    this.path = path.Directory + path.File;
                     break;
 
                 case PathParts.DirectoryFileAndExtension:
-                    this.dir = path.dir;
-                    this.fname = path.fname;
-                    this.ext = path.ext;
+                    this.dirLength = path.dirLength;
+                    this.fileLength = path.fileLength;
+                    this.extLength = path.extLength;
+                    this.path = path.Directory + path.File + path.Extension;
                     break;
 
                 case PathParts.FileAndExtension:
-                    this.fname = path.fname;
-                    this.ext = path.ext;
+                    this.fileLength = path.fileLength;
+                    this.extLength = path.extLength;
+                    this.path = path.File + path.Extension;
                     break;
 
                 case PathParts.All:
                     if (path.HasDrive)
                     {
-                        this.drive = path.drive;
-                        this.dir = path.dir;
-                        this.fname = path.fname;
-                        this.ext = path.ext;
+                        this.driveLength = path.driveLength;
+                        this.dirLength = path.dirLength;
+                        this.fileLength = path.fileLength;
+                        this.extLength = path.extLength;
+                        this.path = path.Drive + path.Directory + path.File + path.Extension;
                     }
                     else
                     {
-                        this.machine = path.machine;
-                        this.share = path.share;
-                        this.dir = path.dir;
-                        this.fname = path.fname;
-                        this.ext = path.ext;
+                        this.machineLength = path.machineLength;
+                        this.shareLength = path.shareLength;
+                        this.dirLength = path.dirLength;
+                        this.fileLength = path.fileLength;
+                        this.extLength = path.extLength;
+                        this.path = path.Machine + path.Share + path.Directory + path.File + path.Extension;
                     }
                     break;
             }
+        }
+
+        private ParsedPath(
+            string path, 
+            int machineLength, 
+            int shareLength, 
+            int driveLength, 
+            int dirLength, 
+            int fileLength, 
+            int extLength)
+        {
+            this.path = path;
+            this.machineLength = checked((short)machineLength);
+            this.shareLength = checked((short)shareLength);
+            this.driveLength = checked((short)driveLength);
+            this.dirLength = checked((short)dirLength);
+            this.fileLength = checked((short)fileLength);
+            this.extLength = checked((short)extLength);
         }
 
         #endregion
@@ -500,11 +542,10 @@ namespace ToolBelt
         }
 
         /// <summary>
-        /// Combine a path fragment with an existing path. You can only combine to the path if it is not 
-        /// contain a filename or extension.
+        /// Combine a path fragment with an existing path. You can only combine to the path if it does not 
+        /// contain a filename or extension and the path fragment has no root directory or volume.
         /// </summary>
         /// <param name="path">A path that is a directory fragment and/or a filename</param>
-        /// <param name="pathFragmentType">The type of the passed in path fragment</param>
         /// <returns></returns>
         public ParsedPath Append(ParsedPath pathFragment)
         {
@@ -516,11 +557,18 @@ namespace ToolBelt
 
             if (pathFragment.HasRootDirectory)
                 throw new ArgumentException("Path fragment must not have a root directory");
-            
+
+            string dir = this.Directory.ToString() + pathFragment.Directory.ToString();
+            string path = this.Volume + dir + pathFragment.File + pathFragment.Extension;
+
             return new ParsedPath(
-                machine, share, drive,
-                this.Directory.ToString() + pathFragment.Directory.ToString(), 
-                pathFragment.fname, pathFragment.ext);
+                path, 
+                machineLength, 
+                shareLength, 
+                driveLength, 
+                dir.Length, 
+                pathFragment.fileLength, 
+                pathFragment.extLength);
         }
 
         /// <summary>
@@ -530,11 +578,19 @@ namespace ToolBelt
         /// <returns></returns>
         public ParsedPath ChangeExtension(string newExtension)
         {
-            ParsedPath pp = new ParsedPath(this, PathParts.VolumeDirectoryAndFile);
+            if (!newExtension.StartsWith("."))
+                throw new ArgumentException("Extensions must start with a '.'");
 
-            pp.ext = newExtension;
+            string path = this.Volume + this.Directory + this.File + newExtension;
 
-            return pp;
+            return new ParsedPath(
+                path, 
+                machineLength, 
+                shareLength, 
+                driveLength, 
+                dirLength, 
+                fileLength, 
+                newExtension.Length);
         }
 
         /// <overloads>Creates a fully qualified file path.</overloads>
@@ -582,25 +638,26 @@ namespace ToolBelt
                 
             if (basePath.Directory == String.Empty)
                 throw new ArgumentException("Base directory has no directory");
+
+            string machine = String.Empty;
+            string share = String.Empty;
+            string drive = String.Empty;
+            string dir = this.Directory;
+            string file = this.File;
+            string ext = this.Extension;
         
-            ParsedPath ppNew = new ParsedPath();
-        
-            // Copy the file and extension
-            ppNew.fname = fname;
-            ppNew.ext = ext;
-            
             // Does this path contain a volume?
             if (HasVolume)
             {
                 // Yes, copy this paths volume
                 if (HasUnc)
                 {
-                    ppNew.machine = machine;
-                    ppNew.share = share;	
+                    machine = this.Machine;
+                    share = this.Share;	
                 }
                 else
                 {
-                    ppNew.drive = drive;
+                    drive = this.Drive;
                 }
             }
             else
@@ -608,18 +665,18 @@ namespace ToolBelt
                 // No, copy base path volume
                 if (basePath.HasUnc)
                 {
-                    ppNew.machine = basePath.machine;
-                    ppNew.share = basePath.share;	
+                    machine = basePath.Machine;
+                    share = basePath.Share;	
                 }
                 else
                 {
-                    ppNew.drive = basePath.drive;
+                    drive = basePath.Drive;
                 }
             }
 
             StringBuilder sb = new StringBuilder(dir.Length);
             int index = 0;  
-            // This is the index of the first character of the remainder of the unprocess part of the directory
+            // This is the index of the first character of the remainder of the unprocessed part of the directory
 
             // Does this path contain a rooted directory, i.e. does it start with '\'?
             if (dir.Length > 0 && dir[index] == Path.DirectorySeparatorChar)
@@ -674,9 +731,12 @@ namespace ToolBelt
             // Add any trailing non-relative part
             sb.Append(dir, index, dir.Length - index);
             
-            ppNew.dir = sb.ToString();
-        
-            return ppNew;
+            dir = sb.ToString();
+
+            string path = (machine.Length == 0 ? drive : machine + share) + dir + file + ext;
+
+            return new ParsedPath(
+                path, machine.Length, share.Length, drive.Length, dir.Length, file.Length, ext.Length);
         }
 
         /// <summary>
@@ -695,12 +755,11 @@ namespace ToolBelt
             if (this.Volume != basePath.Volume)
                 throw new ArgumentException("Both paths must have the same volume (drive or UNC name)");
 
-            ParsedPath ppNew = new ParsedPath();
-            
-            ppNew.fname = this.fname;
-            ppNew.ext = this.ext;
-            ppNew.drive = this.drive;
-            ppNew.share = this.share;
+            string machine = this.Machine;
+            string share = this.Share;
+            string drive = this.Drive;
+            string file = this.File;
+            string ext = this.Extension;
             
             // Get the directory portions of both paths as arrays
             string[] dirs = this.SubDirectories;
@@ -718,7 +777,7 @@ namespace ToolBelt
                 n++;
             }
 
-            StringBuilder sb = new StringBuilder(this.Directory.ToString().Length);
+            StringBuilder sb = new StringBuilder(dirLength);
 
             // If there is nothing left of the base directory, add a '.' then the rest of the directories in this path
             if (baseDirs.Length - n == 0)
@@ -751,9 +810,18 @@ namespace ToolBelt
                 }
             }
             
-            ppNew.dir = sb.ToString();
+            string dir = sb.ToString();
+
+            string path = (machine.Length == 0 ? drive : machine + share) + dir + file + ext;
             
-            return ppNew;
+            return new ParsedPath(
+                path,
+                machine.Length,
+                share.Length,
+                drive.Length,
+                dir.Length,
+                file.Length,
+                ext.Length);
         }
 
         /// <summary>
@@ -812,31 +880,40 @@ namespace ToolBelt
             if (depthChange >= 0)
                 throw new ArgumentOutOfRangeException("depthChange", "Depth change must be < 0");
             
-            ParsedPath ppNew = new ParsedPath();
-            ParsedPath ppFull = this.MakeFullPath(basePath);
+            ParsedPath fullPath = this.MakeFullPath(basePath);
             
             // Copy the stuff that is unchanged
-            ppNew.drive = ppFull.drive;
-            ppNew.share = ppFull.share;
-            ppNew.machine = ppFull.machine;
-            ppNew.fname = ppFull.fname;
-            ppNew.ext = ppFull.ext;
+            string machine = fullPath.Machine;
+            string share = fullPath.Share;
+            string drive = fullPath.Drive;
+            string dir = fullPath.Directory;
+            string file = fullPath.File;
+            string ext = fullPath.Extension;
             
             // Find the nth parent
-            int i = ppFull.dir.Length;
+            int i = dir.Length;
             
             while (depthChange++ < 0)
             {
                 if (i == 1)
                     throw new ArgumentOutOfRangeException("depthChange", "Number of levels specified would go beyond root directory.");
                     
-                i = ppFull.dir.LastIndexOf(Path.DirectorySeparatorChar, i - 2) + 1;
+                i = dir.LastIndexOf(Path.DirectorySeparatorChar, i - 2) + 1;
             }			
             
             // Extract the parent directory
-            ppNew.dir = ppFull.dir.Substring(0, i);
-            
-            return ppNew;
+            dir = dir.Substring(0, i);
+
+            string path = (machine.Length == 0 ? drive : machine + share) + dir + file + ext;
+
+            return new ParsedPath(
+                path,
+                machine.Length,
+                share.Length,
+                drive.Length,
+                dir.Length,
+                file.Length,
+                ext.Length);
         }
         
         #endregion
@@ -860,7 +937,7 @@ namespace ToolBelt
         /// </summary>
         public override string ToString()
         {
-            return (this.HasUnc ? machine + share : drive) + dir + fname + ext;
+            return path;
         }
 
         /// <summary>
@@ -870,18 +947,12 @@ namespace ToolBelt
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            ParsedPath pp = obj as ParsedPath;
+            ParsedPath path = obj as ParsedPath;
             
-            if (pp == null)
+            if (path == null)
                 return false;
 
-            return				
-                this.machine == pp.machine &&
-                this.share == pp.share &&
-                this.drive == pp.drive &&
-                this.dir == pp.dir &&
-                this.fname == pp.fname &&
-                this.ext == pp.ext;
+            return this.path.Equals(path.path, StringComparison.InvariantCultureIgnoreCase);
         }
 
 
@@ -921,7 +992,7 @@ namespace ToolBelt
         /// <returns></returns>
         public static int Compare(ParsedPath a, ParsedPath b)
         {
-            return String.Compare(a.ToString(), b.ToString(), StringComparison.CurrentCultureIgnoreCase);
+            return String.Compare(a.ToString(), b.ToString(), StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -937,11 +1008,11 @@ namespace ToolBelt
 
             if (obj is ParsedPath)
             {
-                return String.Compare(this.ToString(), ((ParsedPath)obj).ToString(), StringComparison.CurrentCultureIgnoreCase);
+                return String.Compare(this.ToString(), ((ParsedPath)obj).ToString(), StringComparison.InvariantCultureIgnoreCase);
             }
             else if (obj is String)
             {
-                return String.Compare(this.ToString(), ((String)obj), StringComparison.CurrentCultureIgnoreCase);
+                return String.Compare(this.ToString(), ((String)obj), StringComparison.InvariantCultureIgnoreCase);
             }
             else
             {
@@ -955,14 +1026,14 @@ namespace ToolBelt
         /// <summary>
         /// Implicit conversion to a string
         /// </summary>
-        /// <param name="pp">The parsed path to convert</param>
+        /// <param name="path">The parsed path to convert</param>
         /// <returns>A string containing equivalent to the entire path</returns>
-        public static implicit operator String(ParsedPath pp)
+        public static implicit operator String(ParsedPath path)
         {
-            if (pp == null)
+            if (path == null)
                 return null;
                 
-            return pp.ToString();
+            return path.ToString();
         }
 
         /// <summary>
@@ -998,7 +1069,7 @@ namespace ToolBelt
             get 
             {
                 // If machine is set, share must be by definition
-                return (machine != String.Empty);
+                return (machineLength != 0);
             }
         }
             
@@ -1010,7 +1081,7 @@ namespace ToolBelt
             get 
             {
                 // If machine is set, share must be by definition
-                return (drive != String.Empty);
+                return (driveLength != 0);
             }
         }
 
@@ -1021,7 +1092,7 @@ namespace ToolBelt
         {
             get
             {
-                return (dir != String.Empty);
+                return (dirLength != 0);
             }
         }
 
@@ -1032,7 +1103,7 @@ namespace ToolBelt
         {
             get
             {
-                return (fname != String.Empty);
+                return (fileLength != 0);
             }
         }
 
@@ -1043,7 +1114,7 @@ namespace ToolBelt
         {
             get
             {
-                return (ext != String.Empty);
+                return (extLength != 0);
             }
         }
 
@@ -1076,7 +1147,7 @@ namespace ToolBelt
         {
             get
             {
-                return dir.Length > 0 && dir[0] == Path.DirectorySeparatorChar;
+                return dirLength > 0 && path[machineLength + shareLength + driveLength] == Path.DirectorySeparatorChar;
             }
         }
 
@@ -1088,7 +1159,7 @@ namespace ToolBelt
         {
             get 
             {
-                return (dir.Length == 1 && dir[0] == Path.DirectorySeparatorChar);
+                return (dirLength == 1 && path[machineLength + shareLength + driveLength] == Path.DirectorySeparatorChar);
             }
         }
 
@@ -1156,7 +1227,7 @@ namespace ToolBelt
         {
             get 
             {
-                return (!HasDirectory || !HasRootDirectory || RelativePathPartSingleLineRegex.Match(dir).Success);
+                return (!HasDirectory || !HasRootDirectory || RelativePathPartSingleLineRegex.Match(Directory).Success);
             }
         }
             
@@ -1213,15 +1284,33 @@ namespace ToolBelt
         /// <summary>
         /// Get the machine name.
         /// </summary>
-        public string Machine { get { return machine; } }
+        public string Machine 
+        { 
+            get 
+            { 
+                return path.Substring(0, machineLength); 
+            } 
+        }
         /// <summary>
         /// Get the share name.
         /// </summary>
-        public string Share { get { return share; } }
+        public string Share 
+        { 
+            get 
+            { 
+                return path.Substring(machineLength, shareLength); 
+            } 
+        }
         /// <summary>
         /// Get the drive name.  
         /// </summary>
-        public string Drive { get { return drive; } }
+        public ParsedPath Drive 
+        { 
+            get 
+            { 
+                return new ParsedPath(path.Substring(0, driveLength), 0, 0, driveLength, 0, 0, 0); 
+            } 
+        }
         /// <summary>
         /// Get the path volume which is one of either machine/share or drive.  
         /// </summary>
@@ -1229,7 +1318,9 @@ namespace ToolBelt
         { 
             get 
             {
-                return new ParsedPath(machine, share, drive, null, null, null);
+                return new ParsedPath(machineLength == 0 ? 
+                    path.Substring(0, driveLength) : path.Substring(0, machineLength + shareLength), 
+                    machineLength, shareLength, driveLength, 0, 0, 0);
             } 
         }
         /// <summary>
@@ -1239,25 +1330,34 @@ namespace ToolBelt
         { 
             get 
             {
-                return new ParsedPath(null, null, null, dir, null, null); 
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength, dirLength), 0, 0, 0, dirLength, 0, 0); 
             } 
         }
         /// <summary>
         ///	Get the name of the last sub-directory in the directory name, with no trailing separator
         /// </summary>
-        public string LastDirectory
+        public ParsedPath LastDirectory
         {
             get
             {
-                if (dir.Length > 0)
+                if (dirLength > 0)
                 {
                     if (IsRootDirectory)
-                        return dir;
+                        return new ParsedPath(
+                            path.Substring(machineLength + shareLength + driveLength, dirLength), 
+                            0, 0, 0, dirLength, 0, 0);
                     else
-                        return dir.Substring(dir.LastIndexOf(Path.DirectorySeparatorChar, dir.Length - 2) + 1);
+                    {
+                        int i = machineLength + shareLength + driveLength;
+                        int j = path.LastIndexOf(Path.DirectorySeparatorChar, i + dirLength - 2) + 1;
+                        int k = i + dirLength - j;
+
+                        return new ParsedPath(path.Substring(j, k), 0, 0, 0, k, 0, 0);
+                    }
                 }
                 else
-                    return dir;
+                    return new ParsedPath();
             }
         }
         /// <summary>
@@ -1290,7 +1390,9 @@ namespace ToolBelt
         { 
             get 
             { 
-                return new ParsedPath(null, null, null, null, fname, null); 
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength + dirLength, fileLength), 
+                    0, 0, 0, 0, fileLength, 0); 
             } 
         }
         /// <summary>
@@ -1300,7 +1402,9 @@ namespace ToolBelt
         { 
             get 
             { 
-                return new ParsedPath(null, null, null, null, null, ext); 
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength + dirLength + fileLength, extLength),
+                    0, 0, 0, 0, 0, extLength); 
             } 
         }
         /// <summary>
@@ -1310,7 +1414,8 @@ namespace ToolBelt
         { 
             get 
             { 
-                return new ParsedPath(machine, share, drive, dir, null, null); 
+                return new ParsedPath(path.Substring(0, machineLength + shareLength + driveLength + dirLength), 
+                    machineLength, shareLength, driveLength, dirLength, 0, 0); 
             } 
         }
         /// <summary>
@@ -1330,7 +1435,9 @@ namespace ToolBelt
         { 
             get 
             { 
-                return new ParsedPath(null, null, null, dir, fname, null); 
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength, dirLength + fileLength), 
+                    0, 0, 0, dirLength, fileLength, 0); 
             } 
         }
         /// <summary>
@@ -1340,7 +1447,9 @@ namespace ToolBelt
         { 
             get 
             { 
-                return new ParsedPath(null, null, null, null, fname, ext); 
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength + dirLength, fileLength + extLength),
+                    0, 0, 0, 0, fileLength, extLength); 
             } 
         }
         /// <summary>
@@ -1350,7 +1459,9 @@ namespace ToolBelt
         { 
             get 
             {
-                return new ParsedPath(machine, share, drive, dir, fname, null);
+                return new ParsedPath(
+                    path.Substring(0, machineLength + shareLength + driveLength + fileLength), 
+                    machineLength, shareLength, driveLength, dirLength, fileLength, 0);
             } 
         }
         /// <summary>
@@ -1360,7 +1471,9 @@ namespace ToolBelt
         {
             get
             {
-                return new ParsedPath(null, null, null, dir, fname, null);
+                return new ParsedPath(
+                    path.Substring(machineLength + shareLength + driveLength, dirLength + fileLength + extLength),
+                    0, 0, 0, dirLength, fileLength, extLength);
             }
         }
 

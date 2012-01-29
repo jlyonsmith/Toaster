@@ -105,7 +105,7 @@ namespace Toaster
         public DeploymentItemAttribute(string path)
         {
             Path = path;
-            OutputDirectory = String.Empty;
+            OutputDirectory = "."; // Deployment directory
         }
 
         public DeploymentItemAttribute(string path, string outputDirectory)
