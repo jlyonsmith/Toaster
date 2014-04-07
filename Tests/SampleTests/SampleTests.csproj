@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5CFE0AF1-C36F-444B-B573-D87B4E1182A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleTests</RootNamespace>
     <AssemblyName>SampleTests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
   </PropertyGroup>
@@ -66,10 +66,6 @@
     <ProjectReference Include="..\..\Toaster\Toaster.csproj">
       <Project>{9FC1CE98-CE91-4D6E-929F-3B8092B28F68}</Project>
       <Name>Toaster</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ToolBelt\ToolBelt.csproj">
-      <Project>{52B1B4C0-34D2-4867-AD1F-0EE565F89DC5}</Project>
-      <Name>ToolBelt</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

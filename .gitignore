@@ -6,6 +6,7 @@
 *.orig
 msbuild.log
 obj/
+packages/
 bin/
 ipch/
 Scratch/

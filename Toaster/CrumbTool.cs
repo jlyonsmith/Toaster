@@ -20,9 +20,8 @@ namespace Toaster
         {
         }
 
-        public CrumbTool(IOutputter outputter)
+        public CrumbTool()
         {
-            Output = new OutputHelper(outputter);
         }
 
         #endregion
@@ -41,8 +40,6 @@ namespace Toaster
                 return new ParsedPath(value, PathType.File).MakeFullPath();
             }
         }
-
-        public OutputHelper Output { get; private set; }
 
         public int ExitCode { get { return (Output.HasOutputErrors ? -1 : 0); } }
 

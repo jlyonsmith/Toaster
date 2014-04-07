@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9FC1CE98-CE91-4D6E-929F-3B8092B28F68}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Toaster</RootNamespace>
     <AssemblyName>Toaster</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ResourceStringWrapperType>ToolBelt.Message</ResourceStringWrapperType>
     <SignAssembly>true</SignAssembly>
@@ -43,12 +43,13 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
+    <Reference Include="ToolBelt">
+      <HintPath>..\packages\ToolBelt.1.8.11228.0\lib\net45\ToolBelt.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Attributes.cs" />
-    <Compile Include="Buckle.cs" />
-    <Compile Include="BuckleTool.cs" />
     <Compile Include="ButterTool.cs" />
     <Compile Include="CollectionAssert.cs" />
     <Compile Include="CrumbTool.cs" />
@@ -76,13 +77,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ToolBelt\ToolBelt.csproj">
-      <Project>{52B1B4C0-34D2-4867-AD1F-0EE565F89DC5}</Project>
-      <Name>ToolBelt</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Toaster\Toaster.targets" />
 </Project>

@@ -65,9 +65,8 @@ namespace Toaster
     	#endregion
         
         #region Construction
-        public ButterTool(IOutputter outputter)
+        public ButterTool()
         {
-            Output = new OutputHelper(outputter);
         }
 
         #endregion
@@ -140,8 +139,6 @@ namespace Toaster
                 return new ParsedPath(value, PathType.File).MakeFullPath();
             }
         }
-
-        public OutputHelper Output { get; private set; }
 
         public int ExitCode { get { return (Output.HasOutputErrors ? -1 : 0); } }
         

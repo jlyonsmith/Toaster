@@ -30,9 +30,8 @@ namespace Toaster
             TestContext = new TestContext();
         }
 
-        public ToastTool(IOutputter outputter)
+        public ToastTool()
         {
-            Output = new OutputHelper(outputter);
         }
 
         #endregion
@@ -103,8 +102,6 @@ namespace Toaster
             }
         }
         
-        public OutputHelper Output { get; private set; }
-
         public int ExitCode 
         { 
             get 
