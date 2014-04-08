@@ -9,31 +9,25 @@ namespace Toaster
     {
         static int Main(string[] args)
         {
-            ButterTool butter = new ButterTool(new ConsoleOutputter(Console.Error));
-
-            // Get any settings from the environment
-            if (!((IProcessEnvironment)butter).ProcessEnvironment())
-            {
-                return 1;
-            }
-
-            // Get all the command line arguments
-            if (!((IProcessCommandLine)butter).ProcessCommandLine(args))
-            {
-                return 1;
-            }
+            ButterTool tool = new ButterTool();
 
             try
             {
-                butter.Execute();
-            }
-            catch (Exception e)
-            {
-                // Log any exceptions that slip through
-                butter.Output.Error(e.ToString());
-            }
+                tool.ProcessEnvironment();
+                tool.ProcessCommandLine(args);
+                tool.Execute();
 
-            return butter.ExitCode;
+                return tool.ExitCode;
+            }
+            catch (Exception exception)
+            {
+                while (exception != null)
+                {
+                    ConsoleUtility.WriteMessage(MessageType.Error, "{0}", exception.Message);
+                    exception = exception.InnerException;
+                }
+                return 1;
+            }
         }
     }
 }

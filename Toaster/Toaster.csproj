@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ResourceStringWrapperType>ToolBelt.Message</ResourceStringWrapperType>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Toaster.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -27,6 +27,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="bash BuildResources.sh" workingdir="${ProjectDir}" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,6 +41,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="BeforeBuild" command="bash BuildResources.sh" workingdir="${ProjectDir}" />
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
@@ -65,19 +75,18 @@
     <Compile Include="TestMethod.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="ToastTool.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <MessageResxFile Include="TestingResources.resx">
-      <SubType>Designer</SubType>
-    </MessageResxFile>
+    <Compile Include="TestingResources.cs" />
+    <Compile Include="ToolBase.cs" />
+    <Compile Include="ProcessCycleStopwatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Toaster.snk" />
-    <None Include="Toaster.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
+    <None Include="TestingResources.strings" />
+    <None Include="BuildResources.sh" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <EmbeddedResource Include="TestingResources.resources" />
+  </ItemGroup>
 </Project>

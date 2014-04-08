@@ -1,13 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Toaster/Assert.cs">
-    <Files>
-      <File FileName="Toaster/ButterTool.cs" Line="143" Column="1" />
-      <File FileName="Toaster/Toaster.csproj" Line="83" Column="1" />
-      <File FileName="Toaster/CrumbTool.cs" Line="44" Column="1" />
-      <File FileName="Toaster/ToastTool.cs" Line="105" Column="1" />
-      <File FileName="Toaster/Assert.cs" Line="61" Column="35" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Toaster" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

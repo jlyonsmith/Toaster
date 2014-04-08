@@ -22,13 +22,6 @@ namespace Toaster
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class TestCleanupAttribute : Attribute
     {
-        #region Instance Constructors
-
-        public TestCleanupAttribute()
-        {
-        }
-
-        #endregion
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]

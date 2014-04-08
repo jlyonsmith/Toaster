@@ -7,38 +7,36 @@ namespace Toaster
 {
     class Program
     {
-        private static IOutputter consoleOutputter = new ConsoleOutputter(Console.Error);
-        
         static int Main(string[] args)
         {
-            ToastTool tool = new ToastTool(consoleOutputter);
-
-            // Get all the command line arguments
-            if (!((IProcessCommandLine)tool).ProcessCommandLine(args))
-            {
-                return 1;
-            }
+            ToastTool tool = new ToastTool();
 
             // Add a handler for any exceptions that occur on different threads.  
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledException);
 
             try
             {
-                tool.Execute();
-            }
-            catch (Exception e)
-            {
-                // Log any exceptions that slip through.
-                tool.Output.Error(e.ToString());
-            }
+                tool.ProcessCommandLine(args);
 
-            return tool.ExitCode;
+                tool.Execute();
+                
+                return tool.ExitCode;
+            }
+            catch (Exception exception)
+            {
+                while (exception != null)
+                {
+                    ConsoleUtility.WriteMessage(MessageType.Error, "{0}", exception.Message);
+                    exception = exception.InnerException;
+                }
+                return 1;
+            }
         }
 
         static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             // We just want to spit out the exception and return a non-zero exit code.
-            consoleOutputter.OutputErrorEvent(new OutputErrorEventArgs(e.ExceptionObject.ToString()));
+            ConsoleUtility.WriteMessage(MessageType.Error, e.ExceptionObject.ToString());
             Environment.Exit(1);
         }
     }

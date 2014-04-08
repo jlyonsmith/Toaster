@@ -29,10 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadClassCreateTests", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTests", "Tests\SampleTests\SampleTests.csproj", "{5CFE0AF1-C36F-444B-B573-D87B4E1182A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolBelt.UnitTests", "Tests\ToolBelt.UnitTests\ToolBelt.UnitTests.csproj", "{591C5B3E-E463-4103-9147-88CB7876EB54}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandTestProgram", "Tests\CommandTestProgram\CommandTestProgram.csproj", "{3F580F82-2C10-4360-B648-431162383731}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,22 +53,6 @@ Global
 		{33EE563C-7580-4533-B52F-979BC53A2CAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33EE563C-7580-4533-B52F-979BC53A2CAA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{33EE563C-7580-4533-B52F-979BC53A2CAA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3F580F82-2C10-4360-B648-431162383731}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Release|Any CPU.Build.0 = Release|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{591C5B3E-E463-4103-9147-88CB7876EB54}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5CFE0AF1-C36F-444B-B573-D87B4E1182A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CFE0AF1-C36F-444B-B573-D87B4E1182A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFE0AF1-C36F-444B-B573-D87B4E1182A5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -118,8 +98,6 @@ Global
 		{2C971404-1AB4-4423-AF1D-DAA03ECD1FFA} = {82E86441-0911-4103-9922-36E896D8F6DF}
 		{7852F74B-72C7-4999-950E-E07E3F9C4062} = {82E86441-0911-4103-9922-36E896D8F6DF}
 		{5CFE0AF1-C36F-444B-B573-D87B4E1182A5} = {82E86441-0911-4103-9922-36E896D8F6DF}
-		{591C5B3E-E463-4103-9147-88CB7876EB54} = {82E86441-0911-4103-9922-36E896D8F6DF}
-		{3F580F82-2C10-4360-B648-431162383731} = {82E86441-0911-4103-9922-36E896D8F6DF}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Toast\Toast.csproj

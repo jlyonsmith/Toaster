@@ -22,7 +22,7 @@ namespace Toaster
 #else
     [CommandLineConfiguration("CommandLineReleaseConfig")]
 #endif
-    public class ToastTool : IProcessCommandLine, ITool
+    public class ToastTool : ToolBase, IProcessCommandLine, ITool
     {
         #region Construction
         static ToastTool()
@@ -106,7 +106,7 @@ namespace Toaster
         { 
             get 
             { 
-                return (Output.HasOutputErrors ? 1 : (TestContext.TestResult != null && !TestContext.TestResult.Success) ? 2 : 0); 
+                return (HasOutputErrors ? 1 : (TestContext.TestResult != null && !TestContext.TestResult.Success) ? 2 : 0); 
             } 
         }
 
@@ -135,8 +135,8 @@ namespace Toaster
         {
             if (ShowHelp)
             {
-                Output.Message(Parser.LogoBanner);
-                Output.Message(Parser.Usage);
+                WriteMessage(Parser.LogoBanner);
+                WriteMessage(Parser.Usage);
                 return;
             }
 
@@ -147,7 +147,7 @@ namespace Toaster
             testResult.StartDate = now.Date;
             testResult.StartTime = now.TimeOfDay;
 
-            Output.Message(MessageImportance.Normal,
+            WriteMessage(
                 TestingResources.RuntimeVersion(
                     Marshal.SizeOf(typeof(IntPtr)) == 4 ? TestingResources.WordSize32 : TestingResources.WordSize64,
                     RuntimeEnvironment.GetSystemVersion().ToString(),
@@ -155,7 +155,7 @@ namespace Toaster
 
             if (TestFile == null)
             {
-                Output.Error(TestingResources.TestAssemblyNotSupplied);
+                WriteError(TestingResources.TestAssemblyNotSupplied);
                 return;
             }
 
@@ -163,7 +163,7 @@ namespace Toaster
 
             if (!File.Exists(TestFile))
             {
-                Output.Error(TestingResources.TestAssemblyCannotBeFound(TestFile));
+                WriteError(TestingResources.TestAssemblyCannotBeFound(TestFile));
                 return;
             }
 
@@ -172,7 +172,7 @@ namespace Toaster
                 // If no deployment directory specified, then it is wherever the test assembly is
                 DeploymentDir = new ParsedPath(TestFile.VolumeAndDirectory, PathType.Directory);
 
-                Output.Message(MessageImportance.Low, TestingResources.DeploymentDirIsTestAssemblyDir);
+                WriteMessage(TestingResources.DeploymentDirIsTestAssemblyDir);
             }
 
             if (DeploymentItems == null)
@@ -214,12 +214,12 @@ namespace Toaster
 
             // If any deployments fail it's an error because we assume we will not be 
             // able to load the test assembly, so change the outputter to upgrade any warnings we print.
-            Output.WarningsAsErrors = true;
+            WarningsAsErrors = true;
 
             if (!CopyDeploymentItems(this.DeploymentItems.ToArray()))
                 return;
 
-            Output.WarningsAsErrors = false;
+            WarningsAsErrors = false;
 
             TestAssembly testAssembly = null;
 
@@ -239,7 +239,7 @@ namespace Toaster
                 if (ExceptionUtility.IsCriticalException(e))
                     throw;
 
-                Output.Error(TestingResources.UnableToLoadTestAssembly(TestFile, e.ToString()));
+                WriteError(TestingResources.UnableToLoadTestAssembly(TestFile, e.ToString()));
 
                 // Not being able to load the test assembly pretty much shuts us down
                 return;
@@ -261,7 +261,7 @@ namespace Toaster
                 foreach (Exception ex in e.LoaderExceptions)
                     message += Environment.NewLine + "   " + ex.Message;
 
-                Output.Error(message);
+                WriteError(message);
 
                 // Not being able to reflect on classes in the test assembly is a critical error
                 return;
@@ -286,7 +286,7 @@ namespace Toaster
 
                 // If we have any problems loading the test assembly that's a critical error
                 // that indicates a deployment problem and we must stop.
-                Output.Error(TestingResources.ProblemProcessingTestAssembly(e.ToString()));
+                WriteError(TestingResources.ProblemProcessingTestAssembly(e.ToString()));
 
                 return;
             }
@@ -315,7 +315,7 @@ namespace Toaster
                     !testClass.Name.EndsWith(TestClassName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     testClass.SetAllTestOutcomesToSkipped();
-                    Output.Message(MessageImportance.Low, TestingResources.SkippingTestClass(testClass.Name));
+                    WriteMessage(TestingResources.SkippingTestClass(testClass.Name));
                     continue;
                 }
 
@@ -326,7 +326,7 @@ namespace Toaster
 
                 Stopwatch classStopwatch = Stopwatch.StartNew();
 
-                Output.Message(MessageImportance.Low, TestingResources.TestClassRunning(testClass.Name));
+                WriteMessage(TestingResources.TestClassRunning(testClass.Name));
 
                 CopyDeploymentItems(testClass.DeploymentItems);
 
@@ -345,11 +345,11 @@ namespace Toaster
 
                     if (e is TargetInvocationException)
                     {
-                        Output.Error(TestingResources.UnableToCreateInstanceOfTestClass(testClass.Name, e.InnerException.Message));
+                        WriteError(TestingResources.UnableToCreateInstanceOfTestClass(testClass.Name, e.InnerException.Message));
                     }
                     else
                     {
-                        Output.Error(TestingResources.UnableToCreateInstanceOfTestClass(testClass.Name, e.Message));
+                        WriteError(TestingResources.UnableToCreateInstanceOfTestClass(testClass.Name, e.Message));
                     }
 
                     // Not being able to create the test class is a critical error and we need to exit
@@ -365,7 +365,7 @@ namespace Toaster
                             !testMethod.Name.EndsWith(TestMethodName, StringComparison.CurrentCultureIgnoreCase))
                         {
                             testMethod.SetTestOutcomeToSkipped();
-                            Output.Message(MessageImportance.Low, TestingResources.SkippingTestMethod(testMethod.Name));
+                            WriteMessage(TestingResources.SkippingTestMethod(testMethod.Name));
                             continue;
                         }
 
@@ -426,14 +426,14 @@ namespace Toaster
                         wr.Write(resultsText);
                     }
 
-                    Output.Message("Test results written to '{0}'", OutputFile.ToString());
+                    WriteMessage("Test results written to '{0}'", OutputFile.ToString());
                 }
                 catch (Exception e)
                 {
                     if (ExceptionUtility.IsCriticalException(e))
                         throw;                    
                         
-                    Output.Error(TestingResources.UnableToWriteOutputFile(OutputFile, e.Message));
+                    WriteError(TestingResources.UnableToWriteOutputFile(OutputFile, e.Message));
                     OutputFile = null;
                 }
             }
@@ -443,9 +443,9 @@ namespace Toaster
                 Console.WriteLine(resultsText);
 
             if (testResult.FailedTests > 0)
-                Output.Warning("{0} test{1} FAILED", testResult.FailedTests, testResult.FailedTests > 1 ? "s" : "");
+                WriteWarning("{0} test{1} FAILED", testResult.FailedTests, testResult.FailedTests > 1 ? "s" : "");
             else
-                Output.Message(MessageImportance.High, "All tests PASSED");
+                WriteMessage("All tests PASSED");
 
             // Test may have failed, but the program HAS executed at this point
             return;
@@ -478,7 +478,7 @@ namespace Toaster
                 if (ExceptionUtility.IsCriticalException(e))
                     throw;
 
-                Output.Warning(TestingResources.UnableToCreateDeploymentDirectory(path));
+                WriteWarning(TestingResources.UnableToCreateDeploymentDirectory(path));
                 return false;
             }
         }
@@ -536,7 +536,7 @@ namespace Toaster
 
         private void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
         {
-            Output.Message(MessageImportance.Low, TestingResources.LoadedAssembly(
+            WriteMessage(TestingResources.LoadedAssembly(
                 (args.LoadedAssembly.GlobalAssemblyCache || args.LoadedAssembly.Location == String.Empty) ? 
                     args.LoadedAssembly.FullName : args.LoadedAssembly.Location));
         }
@@ -561,7 +561,7 @@ namespace Toaster
 
                 OrderAttribute priorityAttr;
 
-                Output.Message(MessageImportance.Low, TestingResources.TestClassFound(type.ToString()));
+                WriteMessage(TestingResources.TestClassFound(type.ToString()));
 
                 TestClass testClass = new TestClass(type);
 
@@ -624,7 +624,7 @@ namespace Toaster
                     {
                         if (testAssembly.AssemblyInitializeMethod != null)
                         {
-                            Output.Error(TestingResources.SecondAssemblyInitializeFound(testClass.Name));
+                            WriteError(TestingResources.SecondAssemblyInitializeFound(testClass.Name));
                             return false;
                         }
 
@@ -637,7 +637,7 @@ namespace Toaster
                     {
                         if (testAssembly.AssemblyCleanupMethod != null)
                         {
-                            Output.Error(TestingResources.SecondAssemblyCleanupFound(testClass.Name));
+                            WriteError(TestingResources.SecondAssemblyCleanupFound(testClass.Name));
                             return false;
                         }
 
@@ -650,7 +650,7 @@ namespace Toaster
                     {
                         if (testClass.ClassInitializeMethod != null)
                         {
-                            Output.Error(TestingResources.SecondClassInitializeFound(testClass.Name));
+                            WriteError(TestingResources.SecondClassInitializeFound(testClass.Name));
                             return false;
                         }
 
@@ -663,7 +663,7 @@ namespace Toaster
                     {
                         if (testClass.ClassCleanupMethod != null)
                         {
-                            Output.Error(TestingResources.SecondClassCleanupFound(testClass.Name));
+                            WriteError(TestingResources.SecondClassCleanupFound(testClass.Name));
                             return false;
                         }
 
@@ -676,7 +676,7 @@ namespace Toaster
                     {
                         if (testClass.TestInitializeMethod != null)
                         {
-                            Output.Error(TestingResources.SecondTestInitializeFound(testClass.Name));
+                            WriteError(TestingResources.SecondTestInitializeFound(testClass.Name));
                             return false;
                         }
 
@@ -689,7 +689,7 @@ namespace Toaster
                     {
                         if (testClass.TestCleanupMethod != null)
                         {
-                            Output.Error(TestingResources.SecondTestCleanupFound(testClass.Name));
+                            WriteError(TestingResources.SecondTestCleanupFound(testClass.Name));
                             return false;
                         }
 
@@ -715,7 +715,7 @@ namespace Toaster
                                 Type exceptionType = expectedExceptionAttr.ExceptionType;
 
                                 if (!exceptionType.IsSubclassOf(typeof(Exception)))
-                                    Output.Warning(TestingResources.ExpectedExceptionMustBeException(testMethod.Name));
+                                    WriteWarning(TestingResources.ExpectedExceptionMustBeException(testMethod.Name));
                                 else
                                     expectedExceptions.Add(exceptionType);
                             }
@@ -748,7 +748,7 @@ namespace Toaster
                 }
 
                 if (testClass.TestCount == 0)
-                    Output.Warning(TestingResources.TestClassHasNoTestMethods(type.Name));
+                    WriteWarning(TestingResources.TestClassHasNoTestMethods(type.Name));
             }
 
             // Sort classes in ascending order
@@ -799,11 +799,11 @@ namespace Toaster
                 // Special processing for executables.  Check if a .pdb file exists and deploy that too.
                 if (deploymentItem.IsExecutable)
                 {
-                    ParsedPath deploymentFilePdb = deploymentItem.Path.ChangeExtension(".pdb");
+                    ParsedPath deploymentFilePdb = deploymentItem.Path.WithExtension(".pdb");
 
                     if (File.Exists(deploymentFilePdb))
                     {
-                        SafeFileCopy(deploymentFilePdb, newDeploymentFile.ChangeExtension(".pdb"));
+                        SafeFileCopy(deploymentFilePdb, newDeploymentFile.WithExtension(".pdb"));
                     }
                 }
 
@@ -814,7 +814,7 @@ namespace Toaster
                 if (ExceptionUtility.IsCriticalException(e))
                     throw;
 
-                Output.Warning(TestingResources.UnableToCopyFile(deploymentItem.Path, newDeploymentFile, e.Message));
+                WriteWarning(TestingResources.UnableToCopyFile(deploymentItem.Path, newDeploymentFile, e.Message));
                 return false;
             }
         }
@@ -833,7 +833,7 @@ namespace Toaster
             TestContext.ResetOutput();
             TestContext.ActiveTestMethod = testMethod;
 
-            Output.Message(MessageImportance.Low, TestingResources.TestMethodRunning(testMethod.Name));
+            WriteMessage(TestingResources.TestMethodRunning(testMethod.Name));
 
             try
             {
@@ -851,13 +851,13 @@ namespace Toaster
 
                     // Indicate to the user to attach the debugger, or Windows will
                     // put up the annoying problem reporting dialog.
-                    Output.Message(MessageImportance.High, "[Attach debugger now or press a key to continue]");
+                    WriteMessage("[Attach debugger now or press a key to continue]");
                     
                     while (true)
                     {
                         if (Debugger.IsAttached)
                         {
-                            Output.Message("Debugger is attached");
+                            WriteMessage("Debugger is attached");
                             Debugger.Break();
                             break;
                         }
@@ -868,7 +868,7 @@ namespace Toaster
                         }
                         else
                         {
-                            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                            Console.ReadKey(true);
                             break;
                         }
                     }
@@ -931,12 +931,12 @@ namespace Toaster
             testMethod.Output = TestContext.GetOutput();
             TestContext.ActiveTestMethod = null;
 
-            Output.Message(MessageImportance.High, TestingResources.PassFailMessage(
+            WriteMessage(TestingResources.PassFailMessage(
                 (testMethod.Exception != null) ? TestingResources.FailedAllCaps : TestingResources.PassedAllCaps, testMethod.Name));
 
             if (testMethod.Exception != null)
             {
-                Output.Error(testMethod.Exception.ToString());
+                WriteError(testMethod.Exception.ToString());
             }
         }
 
@@ -954,7 +954,7 @@ namespace Toaster
         {
             if (!method.IsStatic)
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseNotStatic(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseNotStatic(method.Name));
                 return false;
             }
 
@@ -965,7 +965,7 @@ namespace Toaster
         {
             if (method.IsStatic)
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseInstance(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseInstance(method.Name));
                 return false;
             }
 
@@ -981,7 +981,7 @@ namespace Toaster
         {
             if (method.ReturnType != typeof(void))
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseNotVoidReturn(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseNotVoidReturn(method.Name));
                 return false;
             }
 
@@ -989,7 +989,7 @@ namespace Toaster
 
             if (parameters.Length != 0)
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseHasParameters(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseHasParameters(method.Name));
                 return false;
             }
 
@@ -1000,7 +1000,7 @@ namespace Toaster
         {
             if (method.ReturnType != typeof(void))
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseNotVoidReturn(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseNotVoidReturn(method.Name));
                 return false;
             }
 
@@ -1008,7 +1008,7 @@ namespace Toaster
 
             if (parameters.Length != 1 && parameters[0].GetType() != typeof(TestContext))
             {
-                Output.Warning(TestingResources.MethodIgnoredBecauseNoTestContext(method.Name));
+                WriteWarning(TestingResources.MethodIgnoredBecauseNoTestContext(method.Name));
                 return false;
             }
 
@@ -1050,7 +1050,7 @@ namespace Toaster
             }
             catch (ArgumentException e)
             {
-                Output.Error(TestingResources.UnableToProcessDeploymentItem(
+                WriteError(TestingResources.UnableToProcessDeploymentItem(
                     path, outputDirectory, e.Message));
             }
 
@@ -1061,19 +1061,9 @@ namespace Toaster
         
         #region IProcessCommandLine Members
 
-        public bool ProcessCommandLine(string[] args)
+        public void ProcessCommandLine(string[] args)
         {
-            try
-            {
-                Parser.ParseAndSetTarget(args, this);
-            }
-            catch (CommandLineArgumentException e)
-            {
-                Output.Error(e.Message);
-                return false;
-            }
-
-            return true;
+            Parser.ParseAndSetTarget(args, this);
         }
 
         #endregion

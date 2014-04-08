@@ -9,25 +9,24 @@ namespace Toaster
     {
         static int Main(string[] args)
         {
-            CrumbTool crumb = new CrumbTool(new ConsoleOutputter(Console.Error));
-
-            // Get all the command line arguments
-            if (!((IProcessCommandLine)crumb).ProcessCommandLine(args))
-            {
-                return 1;
-            }
+            CrumbTool tool = new CrumbTool();
 
             try
             {
-                crumb.Execute();
-            }
-            catch (Exception e)
-            {
-                // Log any exceptions that slip through
-                crumb.Output.Error(e.ToString());
-            }
+                tool.ProcessCommandLine(args);
+                tool.Execute();
 
-            return crumb.ExitCode;
+                return tool.ExitCode;
+            }
+            catch (Exception exception)
+            {
+                while (exception != null)
+                {
+                    ConsoleUtility.WriteMessage(MessageType.Error, "{0}", exception.Message);
+                    exception = exception.InnerException;
+                }
+                return 1;
+            }
         }
     }
 }

@@ -69,9 +69,10 @@ namespace Toaster
             this["TestDeploymentDir"] = testDeploymentDir;
             this["TestDir"] = testDeploymentDir;
 
-            FileInfo[] fileInfos = DirectoryInfoUtility.GetFiles(Environment.CurrentDirectory, "*.sln", SearchScope.RecurseParentDirectories);
+            var fileInfos = DirectoryInfoUtility.GetFiles(
+                new ParsedPath(Environment.CurrentDirectory, PathType.Directory).WithFileAndExtension("*.sln"), SearchScope.RecurseParentDirectories);
 
-            if (fileInfos.Length > 0)
+            if (fileInfos.Count > 0)
                 this["SolutionDir"] = new ParsedPath(fileInfos[0].FullName, PathType.Directory).VolumeAndDirectory;
         }
 

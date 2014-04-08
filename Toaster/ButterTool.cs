@@ -22,7 +22,7 @@ namespace Toaster
 #else
     [CommandLineConfiguration("CommandLineReleaseConfig")]
 #endif
-    public class ButterTool : IProcessCommandLine, IProcessEnvironment, ITool
+    public class ButterTool : ToolBase, IProcessCommandLine, IProcessEnvironment, ITool
     {
         #region Private Classes
         private class BinaryToInstrument
@@ -32,9 +32,9 @@ namespace Toaster
                 File = file;
                 
                 // Fill out other properties using deployment directory, etc..
-                SymbolFile = file.ChangeExtension(".pdb");
+                SymbolFile = file.WithExtension(".pdb");
                 InstrumentedFile = deploymentDir.Append(file.FileAndExtension);
-                InstrumentedSymbolFile = InstrumentedFile.ChangeExtension(".pdb");
+                InstrumentedSymbolFile = InstrumentedFile.WithExtension(".pdb");
             }
 
             public bool InGlobalAssemblyCache { get; set; }
@@ -140,7 +140,7 @@ namespace Toaster
             }
         }
 
-        public int ExitCode { get { return (Output.HasOutputErrors ? -1 : 0); } }
+        public int ExitCode { get { return (HasOutputErrors ? -1 : 0); } }
         
         #endregion
 
@@ -163,12 +163,12 @@ namespace Toaster
         {
             if (ShowHelp)
             {
-                Output.Message(Parser.LogoBanner);
-                Output.Message(Parser.Usage);
+                WriteMessage(Parser.LogoBanner);
+                WriteMessage(Parser.Usage);
                 return;
             }
 
-            Output.Message(MessageImportance.Normal,
+            WriteMessage(
                 TestingResources.RuntimeVersion(
                     Marshal.SizeOf(typeof(IntPtr)) == 4 ? TestingResources.WordSize32 : TestingResources.WordSize64,
                     RuntimeEnvironment.GetSystemVersion().ToString(),
@@ -176,13 +176,13 @@ namespace Toaster
 
             if (TestFile == null)
             {
-                Output.Error(TestingResources.TestAssemblyNotSupplied);
+                WriteError(TestingResources.TestAssemblyNotSupplied);
                 return;
             }
 
             if (DeploymentDir == null)
             {
-                Output.Error(TestingResources.DeploymentDirectoryMustBeSpecified);
+                WriteError(TestingResources.DeploymentDirectoryMustBeSpecified);
                 return;
             }
 
@@ -223,13 +223,13 @@ namespace Toaster
             if (!FindTool("ngen.exe", out ngenExe))
                 return;
 
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(toastExe.FileAndExtension, toastExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(crumbExe.FileAndExtension, crumbExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(vsInstrExe.FileAndExtension, vsInstrExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(vsPerfCmdExe.FileAndExtension, vsPerfCmdExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(snExe.FileAndExtension, snExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(gacUtilExe.FileAndExtension, gacUtilExe.VolumeAndDirectory));
-            Output.Message(MessageImportance.Normal, TestingResources.UsingExeFrom(ngenExe.FileAndExtension, ngenExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(toastExe.FileAndExtension, toastExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(crumbExe.FileAndExtension, crumbExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(vsInstrExe.FileAndExtension, vsInstrExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(vsPerfCmdExe.FileAndExtension, vsPerfCmdExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(snExe.FileAndExtension, snExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(gacUtilExe.FileAndExtension, gacUtilExe.VolumeAndDirectory));
+            WriteMessage(TestingResources.UsingExeFrom(ngenExe.FileAndExtension, ngenExe.VolumeAndDirectory));
 
             // Expand all paths in any command line deployment items relative to the working directory
             foreach (var deploymentItem in DeploymentItems)
@@ -241,7 +241,7 @@ namespace Toaster
             // Check for coverage deployment items
             if (CoverageDeploymentItems.Count == 0)
             {
-                Output.Error(TestingResources.NoCoverageDeploymentItemsSpecified);
+                WriteError(TestingResources.NoCoverageDeploymentItemsSpecified);
                 return;
             }
 
@@ -253,13 +253,13 @@ namespace Toaster
 
                 if (!deploymentItem.IsExecutable)
                 {
-                    Output.Error(TestingResources.CoverageDeploymentItemMustBeExecutable(deploymentItem.Path.ToString()));
+                    WriteError(TestingResources.CoverageDeploymentItemMustBeExecutable(deploymentItem.Path.ToString()));
                     return;
                 }
 
                 if (!File.Exists(deploymentItem.Path))
                 {
-                    Output.Error(TestingResources.DeploymentItemDoesNotExist(deploymentItem.Path.ToString()));
+                    WriteError(TestingResources.DeploymentItemDoesNotExist(deploymentItem.Path.ToString()));
                     return;
                 }
 
@@ -273,7 +273,7 @@ namespace Toaster
                 Directory.CreateDirectory(DeploymentDir);
 
             // Get each assemblies full name
-            Output.Message(MessageImportance.High, "Getting assembly full names");
+            WriteMessage("Getting assembly full names");
 
             foreach (var binaryToInstrument in binariesToInstrument)
             {
@@ -281,20 +281,20 @@ namespace Toaster
 
                 GetAssemblyFullName(binaryToInstrument);
 
-                if (Output.HasOutputErrors)
+                if (HasOutputErrors)
                     return;
 
                 if (binaryToInstrument.AssemblyName != null)
                 {
                     CheckForBinaryInGac(binaryToInstrument);
 
-                    if (Output.HasOutputErrors)
+                    if (HasOutputErrors)
                         return;
                 }
             }
 
             // Check assembly GAC status
-            Output.Message(MessageImportance.High, "Getting assembly GAC status");
+            WriteMessage("Getting assembly GAC status");
 
             foreach (var binaryToInstrument in binariesToInstrument)
             {
@@ -302,26 +302,26 @@ namespace Toaster
                 {
                     CheckForBinaryInGac(binaryToInstrument);
 
-                    if (Output.HasOutputErrors)
+                    if (HasOutputErrors)
                         return;
                 }
             }
 
             // Instrument binaries
-            Output.Message(MessageImportance.High, TestingResources.InstrumentBinaries);
+            WriteMessage(TestingResources.InstrumentBinaries);
 
             foreach (var binaryToInstrument in binariesToInstrument)
             {
                 InstrumentBinaryForCoverage(binaryToInstrument);
 
-                if (Output.HasOutputErrors)
+                if (HasOutputErrors)
                     return;
 
                 ChangeMvid(binaryToInstrument);
             }
 
             // Resign assemblies 
-            Output.Message(MessageImportance.High, "Resign Instrumented Assemblies");
+            WriteMessage("Resign Instrumented Assemblies");
 
             foreach (var binaryToInstrument in binariesToInstrument)
             {
@@ -329,13 +329,13 @@ namespace Toaster
                 {
                     if (KeyFile == null)
                     {
-                        Output.Warning(TestingResources.AssemblyHasAStrongNameAndNoKeyFile(binaryToInstrument.File));
+                        WriteWarning(TestingResources.AssemblyHasAStrongNameAndNoKeyFile(binaryToInstrument.File));
                         break;
                     }
 
                     ResignAssembly(binaryToInstrument, KeyFile);
 
-                    if (Output.HasOutputErrors)
+                    if (HasOutputErrors)
                         return;
                 }
             }
@@ -343,7 +343,7 @@ namespace Toaster
             try
             {
                 // Check for strongly named assemblies in the GAC and replace with instrumented ones
-                Output.Message(MessageImportance.High, TestingResources.UpdateGlobalAssemblyCache);
+                WriteMessage(TestingResources.UpdateGlobalAssemblyCache);
 
                 foreach (var binaryToInstrument in binariesToInstrument)
                 {
@@ -355,26 +355,26 @@ namespace Toaster
                             // This might fail if the assembly was installed by an MSI.
                             UninstallBinaryFromGac(binaryToInstrument);
 
-                            if (Output.HasOutputErrors)
+                            if (HasOutputErrors)
                                 break;
 
                             InstallInstrumentedBinaryToGac(binaryToInstrument);
 
-                            if (Output.HasOutputErrors)
+                            if (HasOutputErrors)
                                 break;
                         }
                         else
                         {
                             UpdateBinaryInGacWithInstrumented(binaryToInstrument);
 
-                            if (Output.HasOutputErrors)
+                            if (HasOutputErrors)
                                 break;
                         }
                     }
                 }
 
                 // If any GAC updates failed, bail out now attempting to fix things in the finalizer
-                if (Output.HasOutputErrors)
+                if (HasOutputErrors)
                     return;
 
                 DateTime now = DateTime.Now;
@@ -384,20 +384,20 @@ namespace Toaster
                     PathType.File);
                 
                 // Start the coverage monitor
-                Output.Message(MessageImportance.High, TestingResources.StartCoverageMonitor);
+                WriteMessage(TestingResources.StartCoverageMonitor);
 
                 StartCoverageMonitor(coverageFile);
 
-                if (Output.HasOutputErrors)
+                if (HasOutputErrors)
                     return;
 
                 try
                 {
                     // Run the unit tests
-                    Output.Message(MessageImportance.High, TestingResources.RunUnitTests);
+                    WriteMessage(TestingResources.RunUnitTests);
 
                     CommandLineParser parser = new CommandLineParser(typeof(ToastTool));
-                    ToastTool toast = new ToastTool(new NullOutputter());
+                    ToastTool toast = new ToastTool();
 
                     toast.TestClassName = this.TestClassName;
                     toast.TestMethodName = this.TestMethodName;
@@ -413,19 +413,19 @@ namespace Toaster
                     int exitCode = Command.Run(String.Format("\"{0}\" {1}", toastExe, parser.Arguments));
 
                     if (exitCode != 0)
-                        Output.Error(TestingResources.UnitTestsFailedToRun);
+                        WriteError(TestingResources.UnitTestsFailedToRun);
                 }
                 finally
                 {
                     // Shutdown the coverage monitor
-                    Output.Message(MessageImportance.High, TestingResources.StopCoverageMonitor);
+                    WriteMessage(TestingResources.StopCoverageMonitor);
 
                     StopCoverageMonitor();
                 }
             }
             finally
             {
-                Output.Message(MessageImportance.High, TestingResources.UpdateGlobalAssemblyCache);
+                WriteMessage(TestingResources.UpdateGlobalAssemblyCache);
 
                 // Restore the original binaries in the GAC and NGEN caches
                 foreach (var binaryToInstrument in binariesToInstrument)
@@ -480,7 +480,7 @@ namespace Toaster
 
                 if (paths.Count == 0)
                 {
-                    Output.Error(TestingResources.CannotFindExeInPathDirs(toolExe));
+                    WriteError(TestingResources.CannotFindExeInPathDirs(toolExe));
                     return false;
                 }
             }
@@ -490,7 +490,7 @@ namespace Toaster
 
                 if (paths.Count == 0)
                 {
-                    Output.Error(TestingResources.CannotFindExeInToolDirs(toolExe));
+                    WriteError(TestingResources.CannotFindExeInToolDirs(toolExe));
                     return false;
                 }
             }
@@ -511,7 +511,7 @@ namespace Toaster
             string output;
             int exitCode;
 
-            Output.Message(MessageImportance.Low, command);
+            WriteMessage(command);
 
             if (captureOutput)
             {
@@ -519,7 +519,7 @@ namespace Toaster
             }
             else
             {
-                exitCode = Command.Run(command, null, null);
+                exitCode = Command.Run(command, null, null, debugMode:false);
                 output = String.Empty;
             }
 
@@ -529,7 +529,7 @@ namespace Toaster
             }
             else
             {
-                Output.Error(String.Format(TestingResources.FailureRunning(command, output)));
+                WriteError(String.Format(TestingResources.FailureRunning(command, output)));
             }
         }
 
@@ -557,7 +557,7 @@ namespace Toaster
                         binaryToInstrument.InstrumentedAssemblyName = assemblyName;
                     }
 
-                    Output.Message(MessageImportance.Normal, "Instrumented '{0}' to '{1}", binaryToInstrument.File, binaryToInstrument.InstrumentedFile);
+                    WriteMessage("Instrumented '{0}' to '{1}", binaryToInstrument.File, binaryToInstrument.InstrumentedFile);
                 });
         }
 
@@ -566,7 +566,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" \"{1}\"", chgMvidExe, binaryToInstrument.InstrumentedFile),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Changed MVID on instrumented assembly '{0}'", binaryToInstrument.InstrumentedFile);
+                    WriteMessage("Changed MVID on instrumented assembly '{0}'", binaryToInstrument.InstrumentedFile);
                 });
         }
 
@@ -577,7 +577,7 @@ namespace Toaster
                 {
                     binaryToInstrument.AssemblyName = new AssemblyName(output.Trim());
 
-                    Output.Message(MessageImportance.Normal, "Assembly '{0}' has extended full name '{1}'",
+                    WriteMessage("Assembly '{0}' has extended full name '{1}'",
                         binaryToInstrument.File, GetExtendedFullName(binaryToInstrument.AssemblyName));
                 });
         }
@@ -591,12 +591,12 @@ namespace Toaster
 
                     if (binaryToInstrument.InGlobalAssemblyCache)
                     {
-                        Output.Message(MessageImportance.Normal, "Assembly '{0}' found in GAC",
+                        WriteMessage("Assembly '{0}' found in GAC",
                             binaryToInstrument.File);
                     }
                     else
                     {
-                        Output.Message(MessageImportance.Normal, "Assembly '{0}' not found in GAC",
+                        WriteMessage("Assembly '{0}' not found in GAC",
                             binaryToInstrument.File);
                     }
                 });
@@ -619,7 +619,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" -nologo -u \"{1}\"", gacUtilExe, fullName),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Uninstalled assembly '{0}' from GAC", fullName);
+                    WriteMessage("Uninstalled assembly '{0}' from GAC", fullName);
                 });
         }
 
@@ -638,7 +638,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" -nologo -i \"{1}\"", gacUtilExe, fileName),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Installed assembly '{0}' to GAC", fileName);
+                    WriteMessage("Installed assembly '{0}' to GAC", fileName);
                 });
         }
 
@@ -647,7 +647,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" -nologo -f -i \"{1}\"", gacUtilExe, binaryToInstrument.InstrumentedFile),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Installed '{0}' to GAC", binaryToInstrument.InstrumentedFile);
+                    WriteMessage("Installed '{0}' to GAC", binaryToInstrument.InstrumentedFile);
                 });
         }
 
@@ -656,7 +656,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" -nologo -f -i \"{1}\"", gacUtilExe, binaryToInstrument.File), 
                 output => 
                 {
-                    Output.Message(MessageImportance.Normal, "Updated assembly '{0}' in GAC", GetExtendedFullName(binaryToInstrument.AssemblyName));
+                    WriteMessage("Updated assembly '{0}' in GAC", GetExtendedFullName(binaryToInstrument.AssemblyName));
                 });
         }
 
@@ -665,7 +665,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" -Ra \"{1}\" \"{2}\"", snExe, binaryToInstrument.InstrumentedFile, keyFile),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Resigned '{0}'", binaryToInstrument.InstrumentedFile);
+                    WriteMessage("Resigned '{0}'", binaryToInstrument.InstrumentedFile);
                 });
         }
 
@@ -677,7 +677,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" /start:coverage \"/output:{1}\"", vsPerfCmdExe, coverageFile),
                 output =>            
                 {
-                    Output.Message(MessageImportance.Normal, "Monitor started");
+                    WriteMessage("Monitor started");
                 }, 
                 false);
         }
@@ -687,7 +687,7 @@ namespace Toaster
             RunTool(String.Format("\"{0}\" /shutdown", vsPerfCmdExe),
                 output =>
                 {
-                    Output.Message(MessageImportance.Normal, "Monitor stopped");
+                    WriteMessage("Monitor stopped");
                 });
         }
 
@@ -695,26 +695,16 @@ namespace Toaster
 
         #region IProcessCommandLine Members
 
-        public bool ProcessCommandLine(string[] args)
+        public void ProcessCommandLine(string[] args)
         {
-            try
-            {
-                Parser.ParseAndSetTarget(args, this);
-            }
-            catch (CommandLineArgumentException e)
-            {
-                Output.Error(e.Message);
-                return false;
-            }
-
-            return true;
+            Parser.ParseAndSetTarget(args, this);
         }
 
         #endregion
 
         #region IProcessEnvironment Members
 
-        public bool ProcessEnvironment()
+        public void ProcessEnvironment()
         {
             string toolPath = Environment.GetEnvironmentVariable("BUTTER_TOOLPATH");
 
@@ -736,8 +726,6 @@ namespace Toaster
             {
                 KeyFile = new ParsedPath(keyFile, PathType.File).MakeFullPath();
             }
-
-            return true;
         }
 
         #endregion

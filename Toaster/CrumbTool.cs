@@ -13,7 +13,7 @@ using ToolBelt;
 namespace Toaster
 {
     [CommandLineDescription("CrumbCommandLineDescription")]
-    public class CrumbTool : IProcessCommandLine, ITool
+    public class CrumbTool : ToolBase, IProcessCommandLine, ITool
     {
         #region Construction
         static CrumbTool()
@@ -41,7 +41,7 @@ namespace Toaster
             }
         }
 
-        public int ExitCode { get { return (Output.HasOutputErrors ? -1 : 0); } }
+        public int ExitCode { get { return (HasOutputErrors ? -1 : 0); } }
 
         public static TestContext TestContext { get; private set; }
 
@@ -68,14 +68,14 @@ namespace Toaster
         {
             if (ShowHelp)
             {
-                Output.Message(Parser.LogoBanner);
-                Output.Message(Parser.Usage);
+                WriteMessage(Parser.LogoBanner);
+                WriteMessage(Parser.Usage);
                 return;
             }
 
             if (AssemblyFile == null)
             {
-                Output.Error("Assembly file not supplied");
+                WriteError("Assembly file not supplied");
                 return;
             }
 
@@ -91,19 +91,19 @@ namespace Toaster
             {
                 if (e is FileLoadException)
                 {
-                    Output.Error("Unable to load assembly '{0}'", AssemblyFile);
+                    WriteError("Unable to load assembly '{0}'", AssemblyFile);
                     return;
                 }
 
                 if (e is FileNotFoundException)
                 {
-                    Output.Error("Assembly cannot be found '{0}'", AssemblyFile);
+                    WriteError("Assembly cannot be found '{0}'", AssemblyFile);
                     return;
                 }
 
                 if (e is BadImageFormatException)
                 {
-                    Output.Error("'{0}' is not a valid managed assembly", AssemblyFile);
+                    WriteError("'{0}' is not a valid managed assembly", AssemblyFile);
                     return;
                 }
 
@@ -111,7 +111,7 @@ namespace Toaster
             }
 
             // This is all we came for
-            Output.Message(ButterTool.GetExtendedFullName(assembly.GetName()));
+            WriteMessage(ButterTool.GetExtendedFullName(assembly.GetName()));
 
             return;
         }
@@ -120,19 +120,9 @@ namespace Toaster
 
         #region IProcessCommandLine Members
 
-        public bool ProcessCommandLine(string[] args)
+        public void ProcessCommandLine(string[] args)
         {
-            try
-            {
-                Parser.ParseAndSetTarget(args, this);
-            }
-            catch (CommandLineArgumentException e)
-            {
-                Output.Error(e.Message);
-                return false;
-            }
-
-            return true;
+            Parser.ParseAndSetTarget(args, this);
         }
 
         #endregion
