@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Version>
+  <Files>
+    <File>Toaster/Properties/AssemblyInfo.cs</File>
+    <File>Butter/Properties/AssemblyInfo.cs</File>
+    <File>Toast/Properties/AssemblyInfo.cs</File>
+    <File>Crumb/Properties/AssemblyInfo.cs</File>
+    <File>Tests/BadClassCreateTests/Properties/AssemblyInfo.cs</File>
+    <File>Tests/BadTypeLoadTests/Properties/AssemblyInfo.cs</File>
+    <File>Tests/SampleTests/Properties/AssemblyInfo.cs</File>
+    <File>Toaster.nuspec</File>
+  </Files>
+  <Major>2</Major>
+  <Minor>0</Minor>
+  <Build>10407</Build>
+  <Revision>1</Revision>
+  <StartYear>2014</StartYear>
+</Version>

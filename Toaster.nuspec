@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Toaster</id>
+    <version>2.0.10407.1</version>
+    <authors>jlyonsmith</authors>
+    <owners>jlyonsmith</owners>
+    <licenseUrl>http://github.com/jlyonsmith/Toaster/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>http://github.com/jlyonsmith/Toaster</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A unit test library compatible with Microsoft MSTest with extensions to support functional testing.</description>
+    <releaseNotes>This is the initial release. It is targeted and tested for Mono on OSX and Linux systems only.</releaseNotes>
+    <copyright>Copyright (C) 2014 John Lyon-Smith</copyright>
+    <tags>test functional unit test console mstest mono osx linux</tags>
+    <dependencies>
+      <dependency id="ToolBelt" version="1.8" />
+    </dependencies>  
+  </metadata>
+  <files>
+    <file src="Toaster/bin/Release/Toaster.dll" target="lib/net40" /> 
+  </files>
+</package>
