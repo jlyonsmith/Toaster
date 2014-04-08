@@ -8,7 +8,9 @@ namespace SampleTests
     [TestClass]    
     public class SampleTestsA
     {
+        #pragma warning disable 414
         private static TestContext testContext;
+        #pragma warning restore 414
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext testContext)
@@ -58,7 +60,9 @@ namespace SampleTests
         {
             int a = 1;
             int b = 0;
+            #pragma warning disable 219
             int c = a / b;
+            #pragma warning restore 219
         }
     }
 }

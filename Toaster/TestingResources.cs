@@ -1,5 +1,5 @@
 //
-// This file genenerated by the Buckle tool on 4/7/2014 at 10:02 PM. 
+// This file genenerated by the Buckle tool on 4/7/2014 at 11:16 PM. 
 //
 // Contains strongly typed wrappers for resources in TestingResources.strings
 //
