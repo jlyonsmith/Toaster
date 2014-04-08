@@ -4,6 +4,7 @@
 *.opensdf
 *.suo
 *.orig
+*.nupkg
 msbuild.log
 obj/
 packages/
