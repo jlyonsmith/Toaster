@@ -796,14 +796,14 @@ namespace Toaster
             {
                 SafeFileCopy(deploymentItem.Path, newDeploymentFile);
 
-                // Special processing for executables.  Check if a .pdb file exists and deploy that too.
+                // Special processing for executables.  Check if an .mdb file exists and deploy that too.
                 if (deploymentItem.IsExecutable)
                 {
-                    ParsedPath deploymentFilePdb = deploymentItem.Path.WithExtension(".pdb");
+                    ParsedPath deploymentFilePdb = deploymentItem.Path.WithExtension(".mdb");
 
                     if (File.Exists(deploymentFilePdb))
                     {
-                        SafeFileCopy(deploymentFilePdb, newDeploymentFile.WithExtension(".pdb"));
+                        SafeFileCopy(deploymentFilePdb, newDeploymentFile.WithExtension(".mdb"));
                     }
                 }
 

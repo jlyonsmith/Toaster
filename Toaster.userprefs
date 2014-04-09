@@ -1,11 +1,14 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Tests/SampleTests/SampleTestsA.cs">
+    <Files>
+      <File FileName="Tests/SampleTests/SampleTestsA.cs" Line="13" Column="36" />
+      <File FileName="Tests/BadTypeLoadTests/BadTests.cs" Line="14" Column="1" />
+      <File FileName="Tests/BadClassCreateTests/BadTests.cs" Line="15" Column="32" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Toaster" expanded="True" selected="True" />
-        </State>
+        <State expanded="True" />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

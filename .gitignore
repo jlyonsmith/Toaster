@@ -5,6 +5,7 @@
 *.suo
 *.orig
 *.nupkg
+*.gz
 msbuild.log
 obj/
 packages/

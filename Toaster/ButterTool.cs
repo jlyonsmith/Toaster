@@ -32,9 +32,9 @@ namespace Toaster
                 File = file;
                 
                 // Fill out other properties using deployment directory, etc..
-                SymbolFile = file.WithExtension(".pdb");
+                SymbolFile = file.WithExtension(".mdb");
                 InstrumentedFile = deploymentDir.Append(file.FileAndExtension);
-                InstrumentedSymbolFile = InstrumentedFile.WithExtension(".pdb");
+                InstrumentedSymbolFile = InstrumentedFile.WithExtension(".mdb");
             }
 
             public bool InGlobalAssemblyCache { get; set; }
