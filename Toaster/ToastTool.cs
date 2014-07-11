@@ -19,12 +19,13 @@ namespace Toaster
     [CommandLineExample("ToastCommandLineExample")]
 #if DEBUG    
     [CommandLineConfiguration("CommandLineDebugConfig")]
-#else
+    #else
     [CommandLineConfiguration("CommandLineReleaseConfig")]
 #endif
     public class ToastTool : ToolBase, IProcessCommandLine, ITool
     {
         #region Construction
+
         static ToastTool()
         {
             TestContext = new TestContext();
@@ -37,6 +38,7 @@ namespace Toaster
         #endregion
 
         #region Public Properties
+
         [CommandLineArgument("property", Description = "PropertyArgumentDescription", ValueHint = "PropertyArgumentHint", ShortName = "p")]
         public string Property { get; set; }
 
@@ -77,10 +79,10 @@ namespace Toaster
             }
         }
 
-        [CommandLineArgument("outputfile", Description = "OutputFileArgumentDescription", ShortName="o")]
+        [CommandLineArgument("outputfile", Description = "OutputFileArgumentDescription", ShortName = "o")]
         public ParsedPath OutputFile { get; set; }
 
-        [CommandLineArgument("assemblydir", Description = "AssemblySearchDirArgumentDescription", ValueHint="AssemblySearchDirArgumentHint", ShortName = "ad", Initializer=typeof(InitializeAssemblySearchDirs))]
+        [CommandLineArgument("assemblydir", Description = "AssemblySearchDirArgumentDescription", ValueHint = "AssemblySearchDirArgumentHint", ShortName = "ad", Initializer = typeof(InitializeAssemblySearchDirs))]
         public List<ParsedPath> AssemblySearchDirs { get; set; }
 
         internal class InitializeAssemblySearchDirs
@@ -101,10 +103,10 @@ namespace Toaster
                 return new ParsedPath(value, PathType.File).MakeFullPath();
             }
         }
-        
-        public int ExitCode 
+
+        public int ExitCode
         { 
-            get 
+            get
             { 
                 return (HasOutputErrors ? 1 : (TestContext.TestResult != null && !TestContext.TestResult.Success) ? 2 : 0); 
             } 
@@ -115,6 +117,7 @@ namespace Toaster
         #endregion
 
         #region Private Properties
+
         private CommandLineParser parser;
 
         private CommandLineParser Parser
@@ -131,6 +134,7 @@ namespace Toaster
         #endregion
 
         #region Public Methods
+
         public void Execute()
         {
             if (ShowHelp)
@@ -413,39 +417,38 @@ namespace Toaster
             testResult.EndDate = now.Date;
             testResult.EndTime = now.TimeOfDay;
 
-            // Output test results in XML and use XSLT to format the results.  
-            // Ensure output can be piped into msxsl or xslt.csr script
-            string resultsText = testResult.ToXml();
-            
+            if (testResult.FailedTests > 0)
+                WriteWarning("{0} test{1} FAILED", testResult.FailedTests, testResult.FailedTests > 1 ? "s" : "");
+            else
+                WriteMessage("All tests PASSED");
+
             if (OutputFile != null)
             {
                 try
                 {
-                    using (StreamWriter wr = new StreamWriter(OutputFile.ToString(), false, Encoding.Unicode))
+                    if (OutputFile.ToString() == "-")
                     {
-                        wr.Write(resultsText);
+                        testResult.WriteResults(Console.Error);
                     }
+                    else
+                    {
+                        using (StreamWriter wr = new StreamWriter(OutputFile.ToString(), false, Encoding.Unicode))
+                        {
+                            testResult.WriteResults(wr);
+                        }
 
-                    WriteMessage("Test results written to '{0}'", OutputFile.ToString());
+                        WriteMessage("Test results written to '{0}'", OutputFile.ToString());
+                    }
                 }
                 catch (Exception e)
                 {
                     if (ExceptionUtility.IsCriticalException(e))
                         throw;                    
-                        
+                            
                     WriteError(TestingResources.UnableToWriteOutputFile(OutputFile, e.Message));
                     OutputFile = null;
                 }
             }
-
-            // If no output file OR we failed to write the output file, write to console
-            if (OutputFile == null)
-                Console.WriteLine(resultsText);
-
-            if (testResult.FailedTests > 0)
-                WriteWarning("{0} test{1} FAILED", testResult.FailedTests, testResult.FailedTests > 1 ? "s" : "");
-            else
-                WriteMessage("All tests PASSED");
 
             // Test may have failed, but the program HAS executed at this point
             return;
@@ -486,6 +489,7 @@ namespace Toaster
         #endregion
 
         #region Private Event Handlers
+
         private static object appDomainLock = new object();
 
         private Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
@@ -505,24 +509,44 @@ namespace Toaster
                     // the assembly if no deployment directory was given.  Note that because this event
                     // came from a Load call, using LoadFrom here will still cause the assembly to be in 
                     // the correct load context.
-                    try { return Assembly.LoadFrom(DeploymentDir.Append(fileName, PathType.File)); }
-                    catch (FileNotFoundException) { }
+                    try
+                    {
+                        return Assembly.LoadFrom(DeploymentDir.Append(fileName, PathType.File));
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
 
                     // Search in specified assembly search directories
                     foreach (ParsedPath dir in AssemblySearchDirs)
                     {
-                        try { return Assembly.LoadFrom(dir.Append(fileName, PathType.File)); }
-                        catch (FileNotFoundException) { }
+                        try
+                        {
+                            return Assembly.LoadFrom(dir.Append(fileName, PathType.File));
+                        }
+                        catch (FileNotFoundException)
+                        {
+                        }
                     }
 
                     // Search in the GAC and probing paths with the partial name
-                    try { return Assembly.Load(name); }
-                    catch (FileNotFoundException) { }
+                    try
+                    {
+                        return Assembly.Load(name);
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
 
                     // Search in test assembly source directory
-                    try { return Assembly.LoadFrom(
-                        new ParsedPath(TestFile, PathParts.VolumeAndDirectory).Append(fileName, PathType.File)); }
-                    catch (FileNotFoundException) { }
+                    try
+                    {
+                        return Assembly.LoadFrom(
+                            new ParsedPath(TestFile, PathParts.VolumeAndDirectory).Append(fileName, PathType.File));
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
 
                     // Return null instead of throwing an exception or resource loading breaks
                     return null;
@@ -592,7 +616,7 @@ namespace Toaster
 
                 // Now get all the public methods in the class and search for ones marked with test attributes
                 MethodInfo[] methods = type.GetMethods(
-                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                                           BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
                 List<Type> expectedExceptions = new List<Type>();
 
@@ -786,25 +810,22 @@ namespace Toaster
                     return false;
             }
 
-            ParsedPath newDeploymentFile = deploymentItem.OutputDirectory.Append(deploymentItem.Path.FileAndExtension);
+            ParsedPath deployedFilePath = deploymentItem.OutputDirectory.Append(deploymentItem.Path.FileAndExtension);
 
             // Don't try and copy a file over itself
-            if (newDeploymentFile == deploymentItem.Path)
+            if (deployedFilePath == deploymentItem.Path)
                 return true;
 
             try
             {
-                SafeFileCopy(deploymentItem.Path, newDeploymentFile);
+                SafeFileCopy(deploymentItem.Path, deployedFilePath);
 
-                // Special processing for executables.  Check if an .mdb file exists and deploy that too.
-                if (deploymentItem.IsExecutable)
+                // Check if an .xxx.mdb file exists and deploy that too.
+                ParsedPath deploymentFileMdb = deploymentItem.Path.WithExtension(deploymentItem.Path.Extension + ".mdb");
+
+                if (File.Exists(deploymentFileMdb))
                 {
-                    ParsedPath deploymentFilePdb = deploymentItem.Path.WithExtension(".mdb");
-
-                    if (File.Exists(deploymentFilePdb))
-                    {
-                        SafeFileCopy(deploymentFilePdb, newDeploymentFile.WithExtension(".mdb"));
-                    }
+                    SafeFileCopy(deploymentFileMdb, deployedFilePath.WithExtension(deployedFilePath.Extension + ".mdb"));
                 }
 
                 return true;
@@ -814,7 +835,7 @@ namespace Toaster
                 if (ExceptionUtility.IsCriticalException(e))
                     throw;
 
-                WriteWarning(TestingResources.UnableToCopyFile(deploymentItem.Path, newDeploymentFile, e.Message));
+                WriteWarning(TestingResources.UnableToCopyFile(deploymentItem.Path, deployedFilePath, e.Message));
                 return false;
             }
         }
@@ -1058,7 +1079,7 @@ namespace Toaster
         }
 
         #endregion
-        
+
         #region IProcessCommandLine Members
 
         public void ProcessCommandLine(string[] args)

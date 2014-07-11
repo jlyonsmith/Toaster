@@ -29,14 +29,14 @@ namespace SampleTests
         public void TestAssertThrowsFail1()
         {
             Assert.Throws(delegate { throw new ArgumentException(); }, typeof(NullReferenceException), 
-                "Expected different exception");
+                "Expected different exception.  Test OK.");
         }
 
         [TestMethod]
         [Order(20)]
         public void TestAssertThrowsFail2()
         {
-            Assert.Throws(delegate { }, typeof(NullReferenceException), "Expected an exception");
+            Assert.Throws(delegate { }, typeof(NullReferenceException), "Expected an exception.  Test OK.");
         }
 
         [TestMethod]
@@ -44,7 +44,7 @@ namespace SampleTests
         public void TestAssertThrowsSucceed()
         {
             Assert.Throws(delegate { throw new NullReferenceException(); }, typeof(NullReferenceException), 
-                "Expected exception");
+                "Expected exception.  Test OK.");
         }
     }
 }

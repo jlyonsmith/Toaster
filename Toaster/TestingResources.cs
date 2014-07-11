@@ -1,5 +1,5 @@
 //
-// This file genenerated by the Buckle tool on 4/7/2014 at 11:16 PM. 
+// This file genenerated by the Buckle tool on 7/11/2014 at 5:40 PM. 
 //
 // Contains strongly typed wrappers for resources in TestingResources.strings
 //
@@ -455,28 +455,6 @@ public class TestingResources
     }
 
     /// <summary>
-    /// .NET Framework SDK directory containing strong name signing tool to use for resigning.
-    /// </summary>
-    public static ToolBelt.Message FxToolDirArgumentDescription
-    {
-        get
-        {
-            return new ToolBelt.Message("FxToolDirArgumentDescription", typeof(TestingResources), ResourceManager, null);
-        }
-    }
-
-    /// <summary>
-    /// <fx-tool-dir>
-    /// </summary>
-    public static ToolBelt.Message FxToolDirArgumentHint
-    {
-        get
-        {
-            return new ToolBelt.Message("FxToolDirArgumentHint", typeof(TestingResources), ResourceManager, null);
-        }
-    }
-
-    /// <summary>
     /// Shows command line help.
     /// </summary>
     public static ToolBelt.Message HelpArgumentDescription
@@ -530,7 +508,7 @@ public class TestingResources
     }
 
     /// <summary>
-    /// Copyright (c) 2010 John Lyon-Smith.  All rights reserved.
+    /// Copyright (c) 2014 John Lyon-Smith.  All rights reserved.
     /// </summary>
     public static ToolBelt.Message JohnLyonSmithCopyright
     {
@@ -657,7 +635,7 @@ public class TestingResources
     }
 
     /// <summary>
-    /// The name of a file to write the XML test results to. If not specified the output will be written to the standard output stream.
+    /// The name of a file to write the test results to in TSON format. If dash (-) is given as the name the output will be written to the standard error stream.
     /// </summary>
     public static ToolBelt.Message OutputFileArgumentDescription
     {
@@ -719,7 +697,7 @@ public class TestingResources
     }
 
     /// <summary>
-    /// Properties to pass to the test context. Use a semicolon to separate multiple properties.  TestDir and TestDeploymentDir are always set and contain the deployment directory.  A SolutionDir property is automatically set if there is a Visual Studio solution in a parent directory of the test.  When running under the Visual Studio extension Configuration is set to the current build configuration.
+    /// Properties to pass to the test context. Use a semicolon to separate multiple properties.  TestDir and TestDeploymentDir are always set and contain the deployment directory.  A SolutionDir property is automatically set if there is a .sln file in a parent directory of the test.
     /// </summary>
     public static ToolBelt.Message PropertyArgumentDescription
     {

@@ -78,6 +78,7 @@
     <Compile Include="TestingResources.cs" />
     <Compile Include="ToolBase.cs" />
     <Compile Include="ProcessCycleStopwatch.cs" />
+    <Compile Include="TsonTextWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Toaster.snk" />

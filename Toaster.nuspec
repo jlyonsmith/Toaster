@@ -8,7 +8,7 @@
     <licenseUrl>http://github.com/jlyonsmith/Toaster/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/jlyonsmith/Toaster</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A unit test library compatible with Microsoft MSTest with extensions to support functional testing.</description>
+    <description>A simple, low overhead unit test library for Mono.  It's is based on the API's from NUnit and MSTest.</description>
     <releaseNotes>This is the initial release. It is targeted and tested for Mono on OSX and Linux systems only.</releaseNotes>
     <copyright>Copyright (C) 2014 John Lyon-Smith</copyright>
     <tags>test functional unit test console mstest mono osx linux</tags>
@@ -18,5 +18,7 @@
   </metadata>
   <files>
     <file src="Toaster/bin/Release/Toaster.dll" target="lib/net40" /> 
+    <file src="Toaster/bin/Release/Toast.exe" target="tools" />
+    <file src="Toaster/bin/Release/Scripts/toast" target="tools" />
   </files>
 </package>

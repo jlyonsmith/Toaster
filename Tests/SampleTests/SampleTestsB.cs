@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Toaster;
 
+//
+// This class should have no implicit (setup/teardown) or explicit test defined in it
+//
+
 namespace SampleTests
 {
     [TestClass]

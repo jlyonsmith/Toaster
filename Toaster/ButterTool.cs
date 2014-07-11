@@ -9,10 +9,6 @@ using ToolBelt;
 
 namespace Toaster
 {
-    // TODO-johnls-12/18/2008: Do something about native images.  Right now all we do is change the MVID on the instrumented
-    // image so that NGEN detects that the instrumented image is not the same as the original.  This disables the use of a 
-    // native image during coverage collection.
-
     [CommandLineTitle("ButterCommandLineTitle")]
     [CommandLineDescription("ButterCommandLineDescription")]
     [CommandLineCopyright("JohnLyonSmithCopyright")]

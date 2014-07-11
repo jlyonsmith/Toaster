@@ -17,7 +17,6 @@ namespace Toaster
             try
             {
                 tool.ProcessCommandLine(args);
-
                 tool.Execute();
                 
                 return tool.ExitCode;

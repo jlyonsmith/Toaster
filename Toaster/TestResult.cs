@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Collections.ObjectModel;
+using System.CodeDom.Compiler;
 
 namespace Toaster
 {
@@ -40,119 +41,110 @@ namespace Toaster
             }
         }
 
-        private static Regex stackRegex = new Regex("^   at (?'method'.*?) in (?'file'.*?):line (?'line'[0-9]+)", RegexOptions.Multiline);
+        private static Regex stackRegex = new Regex("^  at (?'method'.*?) in (?'file'.*?):(?'line'[0-9]+)", RegexOptions.Multiline);
 
-        public string ToXml()
+        public void WriteResults(TextWriter writer)
         {
-            StringBuilder sb = new StringBuilder();
+            TsonTextWriter wr = new TsonTextWriter(writer);
 
-            using (XmlTextWriter wr = new XmlTextWriter(new StringWriter(sb)))
-            {
-                wr.Formatting = Formatting.Indented;
-                wr.IndentChar = ' ';
-                wr.Indentation = 2;
-
-                this.ToXml(wr);
-
-                wr.Flush();
-            }
-
-            return sb.ToString();
-        }
-
-        public void ToXml(XmlTextWriter wr)
-        {
-            wr.WriteStartDocument();
-
-            wr.WriteStartElement("TestResult");
-            wr.WriteAttributeString("StartDate", this.StartDate.ToShortDateString());
-            wr.WriteAttributeString("StartTime", this.StartTime.ToString());
-            wr.WriteAttributeString("EndDate", this.EndDate.ToShortDateString());
-            wr.WriteAttributeString("EndTime", this.EndTime.ToString());
-            wr.WriteAttributeString("TestCount", this.TestCount.ToString());
-            wr.WriteAttributeString("PassedTests", this.PassedTests.ToString());
-            wr.WriteAttributeString("FailedTests", this.FailedTests.ToString());
-            wr.WriteAttributeString("SkippedTests", this.SkippedTests.ToString());
+            wr.WriteProperty("StartDate", this.StartDate.ToShortDateString());
+            wr.WriteProperty("StartTime", this.StartTime.ToString());
+            wr.WriteProperty("EndDate", this.EndDate.ToShortDateString());
+            wr.WriteProperty("EndTime", this.EndTime.ToString());
+            wr.WriteProperty("TestCount", this.TestCount.ToString());
+            wr.WriteProperty("PassedTests", this.PassedTests.ToString());
+            wr.WriteProperty("FailedTests", this.FailedTests.ToString());
+            wr.WriteProperty("SkippedTests", this.SkippedTests.ToString());
 
             if (TestAssembly != null)
             {
-                wr.WriteStartElement("TestAssembly");
-                wr.WriteAttributeString("Name", this.TestAssembly.Name);
-                wr.WriteAttributeString("ExecutionTime", this.TestAssembly.ExecutionTime.ToString());
+                wr.WriteObjectPropertyStart("TestAssembly");
+                wr.WriteProperty("Name", this.TestAssembly.Name);
+                wr.WriteProperty("ExecutionTime", this.TestAssembly.ExecutionTime.ToString());
 
                 if (this.TestAssembly.ExecutionCycles != 0)
-                    wr.WriteAttributeString("TotalCycles", this.TestAssembly.ExecutionCycles.ToString());
+                    wr.WriteProperty("TotalCycles", this.TestAssembly.ExecutionCycles.ToString());
 
-                TestMethodToXml(wr, this.TestAssembly.AssemblyInitializeMethod);
+                WriteTestMethod(wr, "AssemblyInitializeMethod", this.TestAssembly.AssemblyInitializeMethod);
+
+                wr.WriteArrayPropertyStart("TestClasses");
 
                 foreach (var testClass in this.TestAssembly.TestClasses_Internal)
                 {
-                    wr.WriteStartElement("TestClass");
-                    wr.WriteAttributeString("Name", testClass.Name);
-                    wr.WriteAttributeString("ExecutionTime", testClass.ExecutionTime.ToString());
+                    wr.WriteArrayObjectStart();
+
+                    wr.WriteProperty("Name", testClass.Name);
+                    wr.WriteProperty("ExecutionTime", testClass.ExecutionTime.ToString());
 
                     if (testClass.ExecutionCycles != 0)
-                        wr.WriteAttributeString("TotalCycles", testClass.ExecutionCycles.ToString());
+                        wr.WriteProperty("TotalCycles", testClass.ExecutionCycles.ToString());
 
-                    wr.WriteAttributeString("Order", testClass.Order.ToString());
+                    wr.WriteProperty("Order", testClass.Order.ToString());
 
-                    TestMethodToXml(wr, testClass.ClassInitializeMethod);
+                    WriteTestMethod(wr, "ClassInitializeMethod", testClass.ClassInitializeMethod);
+
+                    wr.WriteArrayPropertyStart("TestMethods");
 
                     foreach (var testMethod in testClass.TestMethods)
                     {
-                        TestMethodToXml(wr, testMethod.TestInitializeMethod);
+                        wr.WriteArrayObjectStart();
 
-                        TestMethodToXml(wr, testMethod);
+                        WriteTestMethod(wr, "TestInitializeMethod", testMethod.TestInitializeMethod);
+                        WriteTestMethod(wr, "TestMethod", testMethod);
+                        WriteTestMethod(wr, "TestCleanupMethod", testMethod.TestCleanupMethod);
 
-                        TestMethodToXml(wr, testMethod.TestCleanupMethod);
+                        wr.WriteArrayObjectEnd();
                     }
 
-                    TestMethodToXml(wr, testClass.ClassCleanupMethod);
+                    wr.WriteArrayPropertyEnd();  // TestMethods
 
-                    wr.WriteEndElement();   // TestClass
+                    WriteTestMethod(wr, "ClassCleanupMethod", testClass.ClassCleanupMethod);
+
+                    wr.WriteObjectPropertyEnd();   // TestClass
                 }
 
-                TestMethodToXml(wr, this.TestAssembly.AssemblyCleanupMethod);
+                wr.WriteArrayPropertyEnd(); // TestClasses
 
-                wr.WriteEndElement(); // TestAssembly
+                WriteTestMethod(wr, "AssemblyCleanupMethod", this.TestAssembly.AssemblyCleanupMethod);
+
+                wr.WriteObjectPropertyEnd(); // TestAssembly
             }
 
-            wr.WriteEndElement(); // TestResult
+            wr.WriteLine();
         }
 
-        private void TestMethodToXml(XmlTextWriter wr, TestMethod testMethod)
+        private void WriteTestMethod(TsonTextWriter wr, string canonicalMethodName, TestMethod testMethod)
         {
             if (testMethod == null)
                 return;
 
-            wr.WriteStartElement("TestMethod");
-            wr.WriteAttributeString("Name", testMethod.Name);
-            wr.WriteAttributeString("Outcome", testMethod.Outcome.ToString());
-            wr.WriteAttributeString("ExecutionTime", testMethod.ExecutionTime.ToString());
+            wr.WriteObjectPropertyStart(canonicalMethodName);
+
+            wr.WriteProperty("Name", testMethod.Name);
+            wr.WriteProperty("Outcome", testMethod.Outcome.ToString());
+            wr.WriteProperty("ExecutionTime", testMethod.ExecutionTime.ToString());
 
             if (testMethod.ExecutionCycles != 0)
-                wr.WriteAttributeString("TotalCycles", testMethod.ExecutionCycles.ToString());
+                wr.WriteProperty("TotalCycles", testMethod.ExecutionCycles.ToString());
 
             ExplicitTestMethod explicitTestMethod = testMethod as ExplicitTestMethod;
 
             if (explicitTestMethod != null)
-                wr.WriteAttributeString("Order", explicitTestMethod.Order.ToString());
+                wr.WriteProperty("Order", explicitTestMethod.Order.ToString());
 
             if (!String.IsNullOrEmpty(testMethod.Output))
             {
-                wr.WriteStartElement("Output");
-                wr.WriteString(testMethod.Output);
-                wr.WriteEndElement();
+                wr.WriteProperty("Output", testMethod.Output);
             }
 
             if (testMethod.Exception != null)
             {
-                wr.WriteStartElement("Failure");
-                wr.WriteStartElement("Message");
-                wr.WriteString(testMethod.Exception.Message);
-                wr.WriteEndElement(); // Message
+                wr.WriteObjectPropertyStart("Failure");
 
-                wr.WriteStartElement("Stack");
+                wr.WriteProperty("Message", testMethod.Exception.Message);
+
+                wr.WriteArrayPropertyStart("Stack");
+
                 string stackTrace = testMethod.Exception.StackTrace;
 
                 if (stackTrace != null)
@@ -161,22 +153,21 @@ namespace Toaster
 
                     while (m.Success)
                     {
-                        wr.WriteStartElement("StackFrame");
-                        wr.WriteAttributeString("FileName", m.Groups[2].Value);
-                        wr.WriteAttributeString("MethodName", m.Groups[1].Value);
-                        wr.WriteAttributeString("Line", m.Groups[3].Value);
-                        wr.WriteEndElement();
-
+                        wr.WriteArrayObjectStart();
+                        wr.WriteProperty("FileName", m.Groups[2].Value);
+                        wr.WriteProperty("MethodName", m.Groups[1].Value);
+                        wr.WriteProperty("Line", m.Groups[3].Value);
+                        wr.WriteArrayObjectEnd();
                         m = m.NextMatch();
                     }
                 }
 
-                wr.WriteEndElement(); // Stack
+                wr.WriteArrayPropertyEnd(); // Stack
 
-                wr.WriteEndElement(); // Failure
+                wr.WriteObjectPropertyEnd(); // Failure
             }
 
-            wr.WriteEndElement(); // TestMethod
+            wr.WriteObjectPropertyEnd(); // TestMethod
         }
     }
 }

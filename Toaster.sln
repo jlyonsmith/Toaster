@@ -11,6 +11,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EF60F8C0-BCDF-484C-9F81-1262C02A4315}"
 	ProjectSection(SolutionItems) = preProject
 		UnitTest.xslt = UnitTest.xslt
+		Toaster.nuspec = Toaster.nuspec
+		Toaster.version = Toaster.version
+		Toaster.version.config = Toaster.version.config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toast", "Toast\Toast.csproj", "{B03795C8-12A2-47FF-BE52-E5AFC9D684C5}"
