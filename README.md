@@ -64,19 +64,19 @@ Install the tools with NuGet, either in Xamarin Studio or by downloading the NuG
 
 Once you have the tools downloaded, you'll need a script to run the latest version of the `Toast.exe` tool.  I use this one, located in a `bin/` directory in my projects:
 
-	#!/usr/bash
+	#!/bin/bash
 	#
 	# A script to find the newest version of a tool in the NuGet packages directory
 	#
 
 	PKGNAME=Toaster
 	TOOLNAME=Toast
-	PKGDIR=../packages/
+	PKGDIR=../packages
 
 	# See http://stackoverflow.com/questions/4493205/unix-sort-of-version-numbers
-
-	mono $(find $PKGDIR -name $PKGNAME\.\* -type d | sed -Ee 's/^(.*-)([0-9.]+)(\.ime)$/\2.-1 \1\2\3/'  | sort -t. -n -r -k1,1 -k2,2 -k3,3 -k4,4 | head -1)/tools/$TOOLNAME.exe
 	
+	mono $(find $PKGDIR -name $PKGNAME\.\* -type d | sed -Ee 's/^(.*-)([0-9.]+)(\.ime)$/\2.-1 \1\2\3/' | sort -t. -n -r -k1,1 -k2,2 -k3,3 -k4,4 | head -1)/tools/$TOOLNAME.exe $*
+
 This script will always run the newest version of the `Toaster` tools that are installed for your projects.   You may need to adjust the `PKGDIR` for your project. 
 
 Take a look at the `Tests/SampleTests` project for examples of all of all of the Toaster features. 
