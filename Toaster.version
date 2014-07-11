@@ -11,8 +11,8 @@
     <File>Toaster.nuspec</File>
   </Files>
   <Major>2</Major>
-  <Minor>0</Minor>
-  <Build>10407</Build>
-  <Revision>2</Revision>
+  <Minor>1</Minor>
+  <Build>10711</Build>
+  <Revision>1</Revision>
   <StartYear>2014</StartYear>
 </Version>

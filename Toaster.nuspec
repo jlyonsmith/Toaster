@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>Toaster</id>
-    <version>2.0.10407.2</version>
+    <version>2.1.10711.1</version>
     <authors>jlyonsmith</authors>
     <owners>jlyonsmith</owners>
     <licenseUrl>http://github.com/jlyonsmith/Toaster/blob/master/LICENSE.md</licenseUrl>
     <projectUrl>http://github.com/jlyonsmith/Toaster</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A simple, low overhead unit test library for Mono.  It's is based on the API's from NUnit and MSTest.</description>
-    <releaseNotes>This is the initial release. It is targeted and tested for Mono on OSX and Linux systems only.</releaseNotes>
+    <releaseNotes>The primary feature of this release is to change the test output to TSON/JSON format and bug fixes.  It is targeted and tested for Mono on OSX and Linux systems only.</releaseNotes>
     <copyright>Copyright (C) 2014 John Lyon-Smith</copyright>
     <tags>test functional unit test console mstest mono osx linux</tags>
     <dependencies>
@@ -18,7 +18,8 @@
   </metadata>
   <files>
     <file src="Toaster/bin/Release/Toaster.dll" target="lib/net40" /> 
-    <file src="Toaster/bin/Release/Toast.exe" target="tools" />
-    <file src="Toaster/bin/Release/Scripts/toast" target="tools" />
+    <file src="Toast/bin/Release/Toast.exe" target="tools" />
+    <file src="Toast/bin/Release/Toaster.dll" target="tools" />
+    <file src="Toast/bin/Release/ToolBelt.dll" target="tools" />
   </files>
 </package>

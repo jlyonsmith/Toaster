@@ -73,7 +73,7 @@ namespace Toaster
                 new ParsedPath(Environment.CurrentDirectory, PathType.Directory).WithFileAndExtension("*.sln"), SearchScope.RecurseParentDirectories);
 
             if (fileInfos.Count > 0)
-                this["SolutionDir"] = new ParsedPath(fileInfos[0].FullName, PathType.Directory).VolumeAndDirectory;
+                this["SolutionDir"] = new ParsedPath(fileInfos[0].FullName, PathType.File).VolumeAndDirectory;
         }
 
         #endregion

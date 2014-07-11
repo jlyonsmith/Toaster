@@ -11,7 +11,7 @@ namespace SampleTests
 {
     [TestClass]
     [Order(200)]
-    [DeploymentItem(@"$(SolutionDir)SampleTests\TestFiles\TestFile1.txt", "TestFiles")]
+    [DeploymentItem(@"$(SolutionDir)/Tests/SampleTests/TestFiles/TestFile1.txt", "TestFiles")]
     class SampleTestsB
     {
         [AssemblyInitialize]

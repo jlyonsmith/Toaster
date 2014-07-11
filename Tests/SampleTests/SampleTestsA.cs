@@ -35,7 +35,7 @@ namespace SampleTests
         }
 
         [TestMethod]
-        [DeploymentItem(@"$(SolutionDir)SampleTests\TestFiles\TestFile2.txt")]
+        [DeploymentItem(@"$(SolutionDir)Tests/SampleTests/TestFiles/TestFile2.txt")]
         public void TestDeployment()
         {
         }
