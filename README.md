@@ -12,14 +12,14 @@ What I wanted from a unit testing tool was minimalism.  Give me a simple API fra
 
 Toaster is my solution to those problems. It is based on the MSTest framework, which in turn is a direct copy of the original NUnit framework.  I smoothed out some inconsistencies in the API's and added some useful stuff like test ordering and access to environment variables.
 
-Some may consider the MSTest/NUnit API's to be a bit dated now.  For example, the more modern and awesome XUnit eschews the use of initialize/cleanup methods and the need to use CLR attributes to identify test methods.  In my experience, none of the "newer" unit test tools gives you that much that is different from those tools that have been around for a decade.
+Some may consider the MSTest/NUnit API's to be a bit dated now.  For example, the more modern and very awesome [XUnit](https://xunit.codeplex.com/) eschews the use of initialize/cleanup methods and the need to use CLR attributes to identify test methods.  However, in my experience, none of the newer revised unit test tools gives you much that is different from tools that have been around for a decade or more.
 
-In fact, the problem with the newer tools is that they require a rewrite of existing tests.  You can convert MSTest and NUnit tests to Toaster very quickly and easily.  
+In fact, the problem with the newer tools is that they often require a rewrite of existing tests.  You can convert MSTest and NUnit tests to Toaster very quickly and easily.
 
 Another upside of Toaster over other unit test tools is that I believe you can write all 3 kinds of application tests using it:
 
 - Unit tests
-- Function tests
+- System tests
 - Stress tests
 
 The following sections elaborate on each of these types of test.
@@ -36,11 +36,13 @@ I believe unit tests and unit test tools should adhere to the following rules:
 
 Toaster gives you all these features.  The biggest downside right now is that Toaster doesn't have tight integration into Xamarin Studio.  
 
-### Functional Tests
+### System Tests
 
-When I wrote Toaster, I wanted a way to write functional tests too.  By my definition, these are tests which work against an actual installed instance of a product, versus units of code that are run in a sandboxed, mocked environment.  To me, the biggest major difference between unit testing and a functional testing is the ability to run tests in a specific order, because setup time is non-trivial for functional tests.  
+>Previously, I was using the word _functional_ here.  I didn't really like that word to describe this type of testing, so I've switched to _system_ instead.  You're testing the entire system instead of just a _unit_ of it.
 
-Also, it is my contention that it is much, much easier to debug a problem in your logon code if you find out about it early, and not in the middle of your billing system tests 10 minutes later.  Specifically, functional tests need to:
+When I wrote Toaster, I wanted a way to write system tests too.  By my definition, these are tests which work against an actual installed (or partially installed) instance of a product, versus units of code that are run in a sandboxed, mocked environment.  To me, the biggest major difference between unit testing and a system testing is the ability to run tests in a specific order, because setup time is non-trivial for system tests.  
+
+Also, it is my contention that it is much, much easier to debug a problem in your logon code if you find out about it early, and not in the middle of your billing system tests 10 minutes later.  Specifically, system tests need to:
 
 - Work against an actual installed version of the product.
 - Often need to do significant setup and teardown.  Because of that they are...
