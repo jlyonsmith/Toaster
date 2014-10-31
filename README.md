@@ -58,13 +58,13 @@ Finally, there are stress and "fuzz" tests.  These are tests where you simply th
 - Not order dependent.
 - Don't need to be debuggable in a debugger, but need access to really good logging.
 
-## Installation
+## Installation in Xamarin Studio
 
-Install the tools with NuGet, either in Xamarin Studio or by downloading the NuGet command line tool and running:
+My primary .NET development environment these days is [Xamarin Studio](http://xamarin.com/studio).  Here are instructions on how to install Toaster for use with it.
 
-	nuget install Toaster
+First, install the library package with [NuGet](http://www.nuget.org/packages/Toaster/) in the IDE.  You can also try installing the [Xamarin Studio Command Line Tools](http://lastexitcode.com/blog/2014/10/26/XamarinComponentsAndNuGet/) and installing the component that way.
 
-Once you have the tools downloaded, you'll need a script to run the latest version of the `Toast.exe` tool.  I use this one, located in a `bin/` directory in my projects:
+Once you have the tools downloaded and in your `packages/` directory, you'll need a script to run the latest version of the `Toast.exe` tool.  I use this one, located in a `bin/` directory in my projects:
 
 	#!/bin/bash
 	#
